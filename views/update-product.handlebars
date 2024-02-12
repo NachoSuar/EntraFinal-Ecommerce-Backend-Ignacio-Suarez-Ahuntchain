@@ -1,0 +1,30 @@
+{{!-- <form action="/products/update" method="post" enctype="multipart/form-data">
+    <div style="max-width: 400px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <label for="productId" style="display: block; margin-bottom: 5px;">ID del Producto a Actualizar:</label>
+        <input type="text" id="productId" name="productId" placeholder="Ingrese el ID del producto" required style="width: 95%; padding: 8px; margin-bottom: 10px;">
+
+        <!-- Campos para actualizar -->
+        <label for="title" style="display: block; margin-bottom: 5px;">Nuevo Título del producto:</label>
+        <input type="text" id="title" name="title" placeholder="Ingrese el nuevo título" style="width: 95%; padding: 8px; margin-bottom: 10px;">
+
+        <label for="description" style="display: block; margin-bottom: 5px;">Nueva Descripción del producto:</label>
+        <textarea id="description" name="description" placeholder="Ingrese la nueva descripción" style="width: 95%; padding: 8px; margin-bottom: 10px; resize: vertical;"></textarea>
+
+        <label for="price" style="display: block; margin-bottom: 5px;">Nuevo Precio del producto:</label>
+        <input type="text" id="price" name="price" placeholder="Ingrese el nuevo precio" style="width: 95%; padding: 8px; margin-bottom: 10px;">
+
+        <label for="stock" style="display: block; margin-bottom: 5px;">Nuevo Stock del producto:</label>
+        <input type="text" id="stock" name="stock" placeholder="Ingrese el nuevo stock" style="width: 95%; padding: 8px; margin-bottom: 10px;">
+
+        <label for="image" style="display: block; margin-bottom: 5px;">Nueva Imagen:</label>
+        <input type="file" id="image" name="image" accept="image/*" style="width: 95%; padding: 8px; margin-bottom: 10px;">
+
+        <input type="submit" value="Actualizar producto" style="background-color: #3498db; color: white; cursor: pointer; border: none;">
+    </div>
+</form> --}}
+
+<form action="/products/update" method="post" enctype="multipart/form-data">
+    <label for="productId">ID del Producto a Actualizar:</label>
+    <input type="text" id="productId" name="productId" placeholder="Ingrese el ID del producto" required>
+    <input type="submit" value="Actualizar producto">
+</form>

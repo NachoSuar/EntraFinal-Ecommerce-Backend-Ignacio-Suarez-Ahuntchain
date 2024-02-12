@@ -1,0 +1,35 @@
+{{!-- <h1>Chat</h1>
+
+<ul>
+  {{#each messages}}
+    <li>{{this.user}}: {{this.message}}</li>
+  {{/each}}
+</ul>
+
+<form action="/chat" method="post">
+  <label for="user">Usuario:</label>
+  <input type="text" id="user" name="user" required>
+
+  <label for="message">Mensaje:</label>
+  <input type="text" id="message" name="message" required>
+
+  <button type="submit">Enviar mensaje</button>
+</form> --}}
+
+<!-- Formulario de chat -->
+<form action="/products/chat" method="post">
+    <label for="user">Usuario:</label>
+    <input type="text" id="user" name="user" required>
+
+    <label for="message">Mensaje:</label>
+    <textarea id="message" name="message" required></textarea>
+
+    <button type="submit">Enviar mensaje</button>
+</form>
+
+<!-- Mostrar mensajes -->
+<ul>
+    {{#each messages}}
+        <li>{{this.user}}: {{this.message}}</li>
+    {{/each}}
+</ul>

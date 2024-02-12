@@ -1,0 +1,25 @@
+<ul class="top-ul">
+    <li><a href="/products">Ver todos los productos</a></li>
+    <li><a href="/products?stock">Ver únicamente con stock</a></li>
+</ul>
+
+<div class="container">
+    <ul class="product-list">
+        {{#each products}}
+            <li class="product-card">
+                <a href="/products/{{this._id}}" class="product-link">
+                    <img src="/images/products/{{photo}}" alt="{{this.title}}" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">{{this.title}}</h3>
+                        <p class="product-price">${{this.price}}</p>
+                        <!-- Agrega más detalles si es necesario -->
+                    </div>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+
+
+
+
