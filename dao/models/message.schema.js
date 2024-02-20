@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema({
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
     },
@@ -14,6 +14,7 @@ const MessageSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
+
 
 const Message = mongoose.model("Message", MessageSchema);
 

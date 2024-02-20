@@ -1,35 +1,55 @@
-{{!-- <h1>Chat</h1>
-
-<ul>
-  {{#each messages}}
-    <li>{{this.user}}: {{this.message}}</li>
-  {{/each}}
-</ul>
-
-<form action="/chat" method="post">
-  <label for="user">Usuario:</label>
-  <input type="text" id="user" name="user" required>
-
-  <label for="message">Mensaje:</label>
-  <input type="text" id="message" name="message" required>
-
-  <button type="submit">Enviar mensaje</button>
-</form> --}}
-
-<!-- Formulario de chat -->
-<form action="/products/chat" method="post">
-    <label for="user">Usuario:</label>
-    <input type="text" id="user" name="user" required>
-
-    <label for="message">Mensaje:</label>
-    <textarea id="message" name="message" required></textarea>
-
-    <button type="submit">Enviar mensaje</button>
+ <h1>Simple Chat</h1>
+<!-- Formulario HTML -->
+<form id="chat-form">
+    <input type="text" name="user" placeholder="Nombre de usuario">
+    <input type="text" name="message" placeholder="Mensaje">
+    <button type="button" onclick="enviarMensaje()">Enviar</button>
 </form>
 
 <!-- Mostrar mensajes -->
-<ul>
+<ul id="chat-messages">
     {{#each messages}}
-        <li>{{this.user}}: {{this.message}}</li>
+        <li>{{this.user}}: {{this.content}}</li>
     {{/each}}
 </ul>
+
+<!-- Agrega este script al final de tu HTML o enlázalo desde un archivo externo -->
+<script>
+    function enviarMensaje() {
+        const user = document.querySelector('input[name="user"]').value;
+        const message = document.querySelector('input[name="message"]').value;
+
+        // Realiza una solicitud POST a la misma ruta
+        fetch("/products/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user, message }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al enviar mensaje");
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Agrega el mensaje a la lista de mensajes sin recargar la página
+            const chatMessages = document.getElementById("chat-messages");
+            const newMessage = document.createElement("li");
+            newMessage.textContent = `${user}: ${message}`;
+            chatMessages.appendChild(newMessage);
+
+            // Limpia los campos del formulario
+            document.querySelector('input[name="user"]').value = "";
+            document.querySelector('input[name="message"]').value = "";
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+</script>
+<script>
+    console.log("Messages:", {{ messages }});
+</script>
+

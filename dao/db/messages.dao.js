@@ -1,23 +1,17 @@
-import Message from "../models/message.schema.js";
+// messages.dao.js
+let messages = [];
 
 class MessagesDAO {
-    static async getAll() {
-        try {
-            return await Message.find().lean();
-        } catch (error) {
-            console.error("Error en getAll (messages):", error);
-            throw error;
-        }
+    static getAll() {
+        return messages;
     }
 
-    static async add(messageData) {
-        try {
-            return await new Message(messageData).save();
-        } catch (error) {
-            console.error("Error en add (messages):", error);
-            throw error;
-        }
+    static add(user, content) {
+        const message = { user, content };
+        messages.push(message);
+        return message;
     }
 }
 
 export default MessagesDAO;
+

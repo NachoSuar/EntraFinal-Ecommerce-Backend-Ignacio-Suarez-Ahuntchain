@@ -4,6 +4,7 @@ import ProductsDAO from "../dao/products.dao.js";
 import MessagesDAO from "../dao/db/messages.dao.js";
 import { isValidObjectId } from 'mongoose';
 
+
 const router = Router();
 export default router;
 
@@ -36,6 +37,21 @@ router.get("/new", (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
+
+// Ruta para mostrar el formulario de eliminación
+router.get("/remove", (req, res) => {
+    console.log('Intentando renderizar la vista remove-product');
+
+    try {
+        res.render("remove-product");
+        console.log('Vista remove-product renderizada con éxito');
+    } catch (error) {
+        console.error('Error al renderizar la vista remove-product:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
 
 // /products/:id (Visualizar un producto)
 router.get("/:id", async (req, res) => {
@@ -84,69 +100,6 @@ router.post("/", upload.single('image'), async (req, res) => {
 
 
 
-
-
-// Ruta para mostrar el formulario de eliminación
-// router.get('/remove/:id', async (req, res) => {
-//     const id = req.params.id;
-
-//     console.log('Llegó a la ruta de remove GET');
-
-//     try {
-//         // Verifica si id es un ObjectId válido antes de mostrar el formulario
-//         if (!isValidObjectId(id)) {
-//             return res.status(400).send('ID de producto no válido');
-//         }
-
-//         const product = await ProductsDAO.getById(id);
-
-//         if (!product) {
-//             return res.status(404).render('404'); // Producto no encontrado
-//         }
-
-//         res.render('remove-product', { product });
-//     } catch (error) {
-//         console.error('Error al obtener el producto para eliminar:', error);
-//         res.status(500).send('Error interno del servidor');
-//     }
-// });
-
-// // Ruta para mostrar el formulario de actualización
-// router.get('/update/:id', async (req, res) => {
-//     const id = req.params.id;
-
-//     try {
-//         // Verifica si id es un ObjectId válido antes de mostrar el formulario
-//         if (!isValidObjectId(id)) {
-//             return res.status(400).send('ID de producto no válido');
-//         }
-
-//         const product = await ProductsDAO.getById(id);
-
-//         if (!product) {
-//             return res.status(404).render('404'); // Producto no encontrado
-//         }
-
-//         res.render('update-product', { product });
-//     } catch (error) {
-//         console.error('Error al obtener el producto para actualizar:', error);
-//         res.status(500).send('Error interno del servidor');
-//     }
-// });
-
-// Ruta para mostrar el formulario de eliminación
-router.get("/remove", (req, res) => {
-    console.log('Intentando renderizar la vista remove-product');
-
-    try {
-        res.render("remove-product");
-        console.log('Vista remove-product renderizada con éxito');
-    } catch (error) {
-        console.error('Error al renderizar la vista remove-product:', error);
-        res.status(500).send('Error interno del servidor');
-    }
-});
-
 // Ruta para mostrar el formulario de eliminación basada en ID
 router.get('/remove/:id', async (req, res) => {
     const id = req.params.id;
@@ -166,5 +119,39 @@ router.get('/remove/:id', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
+// Página principal del chat
+router.get("/chat", (req, res) => {
+    const allMessages = MessagesDAO.getAll();
+    res.render("chat", { messages: allMessages });
+});
+
+// Manejo del formulario para agregar mensajes al chat
+router.post("/chat", (req, res) => {
+    try {
+        const { user, message } = req.body;
+
+        // Verifica si los datos se están recibiendo correctamente
+        console.log("Datos recibidos del cliente:", { user, message });
+
+        // Validación simple de datos
+        if (!user || !message) {
+            return res.status(400).json({ error: "Nombre de usuario y mensaje son obligatorios" });
+        }
+
+        // Agrega el mensaje a la "base de datos" (array en memoria)
+        MessagesDAO.add(user, message);
+
+        // Redirige a la página del chat
+        res.redirect("/products/chat");
+    } catch (error) {
+        console.error('Error al procesar la solicitud de agregar mensaje:', error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
+
+
+
 
 

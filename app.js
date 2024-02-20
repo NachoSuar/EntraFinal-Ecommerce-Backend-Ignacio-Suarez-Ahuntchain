@@ -59,14 +59,17 @@ app.get("/ping", (req, res) => {
     res.send("Pong!");
 });
 
+
+app.get("/chat", (req, res) => {
+    res.render("chat");
+});
+
+
 // Página error 404
 app.use((req, res, next) => {
     res.render("404");
 });
 
-app.get("/chat", (req, res) => {
-    res.render("chat");
-});
 
 // Manejo de conexiones de socket
 io.on('connection', (socket) => {
@@ -83,6 +86,7 @@ io.on('connection', (socket) => {
     });
 });
 
+
 // Conexión MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/epcilon");
 
@@ -94,3 +98,4 @@ app.listen(3000, () => {
     console.log("App listening on port 3000");
 });
 
+export { io };
