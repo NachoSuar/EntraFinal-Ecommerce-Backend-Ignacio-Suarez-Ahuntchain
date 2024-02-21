@@ -1,5 +1,4 @@
  <h1>Simple Chat</h1>
-<!-- Formulario HTML -->
 <form id="chat-form">
     <input type="text" name="user" placeholder="Nombre de usuario">
     <input type="text" name="message" placeholder="Mensaje">
@@ -13,13 +12,11 @@
     {{/each}}
 </ul>
 
-<!-- Agrega este script al final de tu HTML o enlázalo desde un archivo externo -->
 <script>
     function enviarMensaje() {
         const user = document.querySelector('input[name="user"]').value;
         const message = document.querySelector('input[name="message"]').value;
 
-        // Realiza una solicitud POST a la misma ruta
         fetch("/products/chat", {
             method: "POST",
             headers: {

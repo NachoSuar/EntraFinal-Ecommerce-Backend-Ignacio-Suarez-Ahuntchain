@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const ProductsSchema = new mongoose.Schema({
     title: {
@@ -21,6 +21,9 @@ const ProductsSchema = new mongoose.Schema({
     }
 });
 
+// Registrar el modelo "Products" antes de exportarlo
 const Products = mongoose.model("Products", ProductsSchema);
 
+// Exportar el modelo "Products"
 export default Products;
+

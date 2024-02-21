@@ -34,14 +34,11 @@ router.get('/add/:productId', async (req, res) => {
     }
 
     try {
-        // Puedes utilizar un userId predeterminado o cualquier lógica que prefieras
-        const userId = 'defaultUserId'; // Cambia esto según tus necesidades
+        // No se necesita ningún userId, simplemente obtén o crea el carrito sin depender de la información del usuario
+        const userCart = await CartsDAO.getOrCreateCart();
 
-        // Obtén el carrito del usuario o créalo si no existe
-        const userCart = await CartsDAO.getOrCreateCart(userId);
-
-        // Agrega el producto al carrito utilizando el método de tu DAO
-        await CartsDAO.addToCart(userCart._id, productId, 1); // Asumiendo una cantidad predeterminada de 1
+        // Agrega el producto al carrito
+        await CartsDAO.addToCart(userCart._id, productId, 1);
 
         // Redirige a la página de carritos o a donde prefieras
         res.redirect('/carts');

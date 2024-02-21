@@ -13,16 +13,13 @@
                 {{/each}}
             </ul>
             <form method="post" action="/carts/{{this._id}}">
-                <!-- Aquí puedes agregar campos adicionales para actualizar el carrito -->
                 <input type="submit" value="Actualizar Carrito">
             </form>
             <form method="post" action="/carts/{{this._id}}/remove">
-                <!-- Aquí puedes agregar campos adicionales para eliminar el carrito -->
                 <input type="submit" value="Eliminar Carrito">
             </form>
         {{else}}
             <p>El carrito está vacío</p>
-            {{!-- Agrega un log para depurar --}}
             <script>console.log(this.products)</script>
         {{/if}}
     </div>
