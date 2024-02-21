@@ -24,20 +24,24 @@ router.delete('/:cid/products/:pid', async (req, res) => {
 });
 
 
-router.post('/add', async (req, res) => {
-    console.log(req.body); // Agrega esta línea para imprimir el cuerpo de la solicitud
+// Ruta del carrito para agregar un producto por ID
+router.get('/add/:productId', async (req, res) => {
+    const productId = req.params.productId; // Obtener productId de la URL
 
-    const productId = req.body.productId;
-    const quantity = req.body.quantity;
-
-    // Verifica que productId no esté vacío antes de continuar
+    // Asegúrate de que productId no esté vacío antes de continuar
     if (!productId) {
         return res.status(400).send('Error: productId no válido');
     }
 
     try {
+        // Puedes utilizar un userId predeterminado o cualquier lógica que prefieras
+        const userId = 'defaultUserId'; // Cambia esto según tus necesidades
+
+        // Obtén el carrito del usuario o créalo si no existe
+        const userCart = await CartsDAO.getOrCreateCart(userId);
+
         // Agrega el producto al carrito utilizando el método de tu DAO
-        await CartsDAO.addToCart(productId, quantity);
+        await CartsDAO.addToCart(userCart._id, productId, 1); // Asumiendo una cantidad predeterminada de 1
 
         // Redirige a la página de carritos o a donde prefieras
         res.redirect('/carts');
@@ -46,6 +50,9 @@ router.post('/add', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
+
+
 
 
 

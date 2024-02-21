@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import http from 'http';
 import { Server } from 'socket.io'; 
 import cartsRouter from "./routes/carts.route.js";
-
+import Cart from './dao/models/cart.schema.js';
 import prodsRouter from './routes/products.route.js';
 
 // Función para validar ObjectId
@@ -47,6 +47,18 @@ app.get("/products/remove", (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
+
+// modelo del carrito
+app.get('/mostrar_carrito', async (req, res) => {
+    try {
+      const carrito = await Cart.findOne({ /* condiciones de búsqueda */ });
+      res.json(carrito);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error al obtener el carrito');
+    }
+  });
 
 
 // Home del sitio

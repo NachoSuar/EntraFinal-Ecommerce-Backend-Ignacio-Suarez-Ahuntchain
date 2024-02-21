@@ -1,5 +1,6 @@
 import Cart from './models/cart.schema.js';
 import ProductsDAO from './products.dao.js';
+import mongoose from 'mongoose';
 
 class CartsDAO {
     static async deleteProduct(cartId, productId) {
@@ -27,7 +28,7 @@ class CartsDAO {
             const cart = await Cart.findOneAndUpdate(
                 {},  // Sin condición para seleccionar un carrito específico
                 { $push: { products: { productId, quantity } } },
-                { new: true, upsert: true }
+                { upsert: true, new: true }
             ).populate('products.productId');
     
             if (!cart) {
@@ -40,8 +41,18 @@ class CartsDAO {
             throw error;
         }
     }
-    
-    
+
+    static async getOrCreateCart() {
+        try {
+            // Crea un nuevo carrito sin asignar a un usuario específico
+            const newCart = new Cart({ products: [], userId: null }); // Agrega userId: null
+            await newCart.save();
+            return newCart;
+        } catch (error) {
+            console.error('Error al obtener o crear el carrito:', error);
+            throw error;
+        }
+    }
 }
 
 export default CartsDAO;

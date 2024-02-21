@@ -8,13 +8,7 @@
 
     {{#if isStock}}
         <p>Precio: {{price}}</p>
-        <form id="addToCartForm" method="post" action="/carts/add" style="margin-top: 15px;">
-            <input type="hidden" name="productId" id="productId" value="{{_id}}">
-            <label for="quantity">Cantidad:</label>
-            <input type="number" id="quantity" name="quantity" value="1" min="1" required>
-            <button type="submit" style="background-color: #4caf50; color: white; cursor: pointer; border: none;">Agregar al Carrito</button>
-        </form>
-
+        <a href="/carts/add/{{productId}}" style="background-color: #4caf50; color: white; cursor: pointer; border: none; padding: 8px 12px; text-decoration: none;">Agregar al Carrito</a>
     {{else}}
         <p>No hay stock del producto</p>
     {{/if}}
@@ -24,15 +18,5 @@
     </a>
 </div>
 
-<script>
-    document.getElementById('addToCartForm').addEventListener('submit', function(event) {
-    const productId = document.getElementById('productId').value;
 
-    if (!productId) {
-        event.preventDefault();
-        alert('Error: Selecciona un producto antes de agregar al carrito');
-    }
-});
-
-</script>
 

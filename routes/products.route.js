@@ -119,12 +119,14 @@ router.get("/:id", async (req, res) => {
             photo: product.photo,
             price: product.price,
             isStock: product.stock > 0,
+            productId: id, // Pasa el productId a la vista
         });
     } catch (error) {
         console.error('Error al renderizar la vista product:', error);
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 
 router.post("/", upload.single('image'), async (req, res) => {
