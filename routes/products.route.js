@@ -13,20 +13,62 @@ export default router;
 router.get("/", async (req, res) => {
     try {
         let withStock = req.query.stock;
-    
+        let limit = parseInt(req.query.limit) || 10;
+        let page = parseInt(req.query.page) || 1;
+        let sort = req.query.sort === 'desc' ? -1 : 1;
+        let query = req.query.query || '';
+
+        let skip = (page - 1) * limit;
+
         let products;
+        let totalCount;
+
         if (withStock === undefined) {
-            products = await ProductsDAO.getAll();
+            if (query) {
+                // Realizar búsqueda con filtro
+                console.log('Búsqueda con filtro - Parámetros:', { query, limit, skip, sort });  // Agregado
+                products = await ProductsDAO.getByFilter(query, limit, skip, sort);
+                totalCount = await ProductsDAO.getCountByFilter(query);
+            } else {
+                // Realizar búsqueda general
+                console.log('Búsqueda general - Parámetros:', { limit, skip, sort });  // Agregado
+                products = await ProductsDAO.getAll(limit, skip, sort);
+                totalCount = await ProductsDAO.getCount();
+            }
         } else {
-            products = await ProductsDAO.getAllWithStock();
+            // Realizar búsqueda con stock
+            console.log('Búsqueda con stock - Parámetros:', { limit, skip, sort });  // Agregado
+            products = await ProductsDAO.getAllWithStock(limit, skip, sort);
+            totalCount = await ProductsDAO.getCountWithStock();
         }
-    
-        res.render("products", { products });
+
+        const totalPages = Math.ceil(totalCount / limit);
+        const hasPrevPage = page > 1;
+        const hasNextPage = page < totalPages;
+        const prevLink = hasPrevPage ? `/products?limit=${limit}&page=${page - 1}&sort=${sort}&query=${query}` : null;
+        const nextLink = hasNextPage ? `/products?limit=${limit}&page=${page + 1}&sort=${sort}&query=${query}` : null;
+
+        const result = {
+            status: 'success',
+            payload: products,
+            totalPages,
+            prevPage: hasPrevPage ? page - 1 : null,
+            nextPage: hasNextPage ? page + 1 : null,
+            page,
+            hasPrevPage,
+            hasNextPage,
+            prevLink,
+            nextLink,
+        };
+
+
+        res.render("products", { result });
     } catch (error) {
         console.error('Error al renderizar la vista products:', error);
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 // /products/new
 router.get("/new", (req, res) => {
@@ -87,16 +129,21 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", upload.single('image'), async (req, res) => {
     try {
+        console.log('Archivo de imagen cargado:', req.file);
+
         let filename = req.file.filename;
         let product = req.body;
 
+        // Llamada al método add de ProductsDAO
         await ProductsDAO.add(product.title, product.description, filename, product.price, product.stock);
+
         res.redirect("/products");
     } catch (error) {
         console.error('Error al procesar la solicitud de agregar producto:', error);
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 
 

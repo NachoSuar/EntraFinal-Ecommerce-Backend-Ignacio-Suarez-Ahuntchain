@@ -1,11 +1,15 @@
 <ul class="top-ul">
     <li><a href="/products">Ver todos los productos</a></li>
     <li><a href="/products?stock">Ver únicamente con stock</a></li>
+    <!-- Agrega enlaces con los nuevos parámetros -->
+    <li><a href="/products?limit=10&page=1&sort=asc">Ver primeros 10 productos ascendentes</a></li>
+    <li><a href="/products?limit=10&page=1&sort=desc">Ver primeros 10 productos descendentes</a></li>
+    <li><a href="/products?limit=10&page=1&sort=asc&query=tu_busqueda">Buscar productos con filtro</a></li>
 </ul>
 
 <div class="container">
     <ul class="product-list">
-        {{#each products}}
+        {{#each result.payload}} <!-- Ajuste aquí -->
             <li class="product-card">
                 <a href="/products/{{this._id}}" class="product-link">
                     <img src="/images/products/{{photo}}" alt="{{this.title}}" class="product-image">
@@ -19,6 +23,26 @@
         {{/each}}
     </ul>
 </div>
+
+<ul class="pagination" style="list-style: none; display: flex; justify-content: center; align-items: center;">
+
+    {{#if result.hasPrevPage}}
+        <li style="margin: 0 5px;"><a href="{{result.prevLink}}" style="padding: 5px 10px; text-decoration: none; border: 1px solid #ccc; border-radius: 5px; color: #333;">Anterior</a></li>
+    {{else}}
+        <li style="margin: 0 5px;" class="disabled"><span style="padding: 5px 10px; text-decoration: none; border: 1px solid #ccc; border-radius: 5px; color: #ccc;">Anterior</span></li>
+    {{/if}}
+
+    <li style="margin: 0 5px;" class="active"><span style="padding: 5px 10px; text-decoration: none; border: 1px solid #ccc; border-radius: 5px; color: #333;">Página {{result.page}}</span></li>
+
+    {{#if result.hasNextPage}}
+        <li style="margin: 0 5px;"><a href="{{result.nextLink}}" style="padding: 5px 10px; text-decoration: none; border: 1px solid #ccc; border-radius: 5px; color: #333;">Siguiente</a></li>
+    {{else}}
+        <li style="margin: 0 5px;" class="disabled"><span style="padding: 5px 10px; text-decoration: none; border: 1px solid #ccc; border-radius: 5px; color: #ccc;">Siguiente</span></li>
+    {{/if}}
+
+</ul>
+
+
 
 
 

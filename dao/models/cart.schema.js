@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+// carts.schema.js
+import mongoose from 'mongoose';
 
 const CartSchema = new mongoose.Schema({
     userId: {
@@ -9,6 +10,7 @@ const CartSchema = new mongoose.Schema({
         {
             productId: {
                 type: mongoose.Schema.Types.ObjectId,
+                ref: 'Product',  // Hace referencia al modelo de Products
                 required: true,
             },
             quantity: {
@@ -22,4 +24,5 @@ const CartSchema = new mongoose.Schema({
 const Cart = mongoose.model("Cart", CartSchema);
 
 export default Cart;
+
 

@@ -1,0 +1,31 @@
+<h1>Carritos</h1>
+
+{{#each carts}}
+    <div>
+        <h2>Carrito {{this._id}}</h2>
+        {{#if this.products.length}}
+            <ul>
+                {{#each this.products}}
+                    <li>
+                        Producto: {{this.title}} -
+                        Cantidad: {{this.quantity}}
+                    </li>
+                {{/each}}
+            </ul>
+            <form method="post" action="/carts/{{this._id}}">
+                <!-- Aquí puedes agregar campos adicionales para actualizar el carrito -->
+                <input type="submit" value="Actualizar Carrito">
+            </form>
+            <form method="post" action="/carts/{{this._id}}/remove">
+                <!-- Aquí puedes agregar campos adicionales para eliminar el carrito -->
+                <input type="submit" value="Eliminar Carrito">
+            </form>
+        {{else}}
+            <p>El carrito está vacío</p>
+            {{!-- Agrega un log para depurar --}}
+            <script>console.log(this.products)</script>
+        {{/if}}
+    </div>
+{{/each}}
+
+

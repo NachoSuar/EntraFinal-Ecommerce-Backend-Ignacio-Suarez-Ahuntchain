@@ -3,7 +3,7 @@ import { engine } from 'express-handlebars';
 import mongoose from "mongoose";
 import http from 'http';
 import { Server } from 'socket.io'; 
-
+import cartsRouter from "./routes/carts.route.js";
 
 import prodsRouter from './routes/products.route.js';
 
@@ -31,6 +31,9 @@ app.use(express.urlencoded({extended:true}));
 
 // Router productos
 app.use("/products", prodsRouter);
+
+// Router Carts
+app.use("/carts", cartsRouter);
 
 // Nueva ruta para eliminar productos
 app.get("/products/remove", (req, res) => {
