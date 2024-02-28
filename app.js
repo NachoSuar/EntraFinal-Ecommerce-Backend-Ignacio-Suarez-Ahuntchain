@@ -10,6 +10,7 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import MongoStore from "connect-mongo";
 import sessionsRouter from './routes/session.js';
+import viewRouter from "./routes/views.js"
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
