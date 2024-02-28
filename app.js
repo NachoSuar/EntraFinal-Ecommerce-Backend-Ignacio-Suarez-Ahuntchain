@@ -6,6 +6,10 @@ import { Server } from 'socket.io';
 import cartsRouter from "./routes/carts.route.js";
 import Cart from './dao/models/cart.schema.js';
 import prodsRouter from './routes/products.route.js';
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import MongoStore from "connect-mongo";
+import sessionsRouter from './routes/session.js';
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -28,6 +32,26 @@ app.use(express.static('public'));
 // Middlewares request
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
+
+app.use(cookieParser());
+app.use(session({
+    store:MongoStore.create({
+        mongoUrl:"mongodb://127.0.0.1:27017/epcilon",
+        ttl: 240,
+    }),
+    secret:"secretCode",
+    resave: true,
+    saveUninitialized: true
+}));
+
+app.use("/api/sessions", sessionsRouter);
+app.use("/", viewRouter);
+
+
+
+
+
 
 // Router productos
 app.use("/products", prodsRouter);
