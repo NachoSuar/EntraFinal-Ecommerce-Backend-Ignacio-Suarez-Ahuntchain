@@ -44,4 +44,4 @@ router.get ("/profile", async (req, res) =>{
 
 });
 
-export default Router;
+export default router;

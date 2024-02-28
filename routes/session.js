@@ -1,8 +1,8 @@
 import { Router } from "express";
 import UsersDAO from "../dao/users.dao.js";
-import router from "./products.route.js";
 
-const route = Router()
+
+const router = Router()
 
 router.post("/register", async (req, res) => {
 
@@ -27,7 +27,7 @@ router.post("/register", async (req, res) => {
 
 });
 
-route.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
     let email = req.body.email;
     let password =  req.body.password;
 
