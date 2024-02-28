@@ -41,15 +41,27 @@ router.post("/login", async (req, res) => {
         res.redirect("/login");
     } else {
         req.session.user = user._id;
-        res.redirect("/profile");
+        res.redirect("/products");
     }
     
 
-    router.get("/logout", (req, res) =>{
-        req.session.destroy((err) =>{
-            res.redirect("/home");
-        });
+
+});
+
+//----------> Ejemplo de Logout que redirecciona al login <------------------
+// router.get("/logout", (req, res) => {
+//     req.session.destroy((err) => {
+//         res.redirect("/login");
+//     });
+// });
+
+
+// Logout
+router.get("/logout", (req, res) => {
+    req.session.destroy((err) => {
+        res.redirect("/home");
     });
 });
 
 export default router;
+

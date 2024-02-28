@@ -21,9 +21,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-
-
-
+    is_admin:{
+        type: Boolean,
+        require: true,
+    }
 });
 
 export default mongoose.model("Users", UserSchema);

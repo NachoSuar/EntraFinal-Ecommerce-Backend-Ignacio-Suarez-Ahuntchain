@@ -7,15 +7,23 @@ router.get('/', (req, res) => {
     res.redirect('/home');
 });
 
-router.get('/home', (req, res) => {
-
+function middleware_auth(req, res, next){
     if(req.session.user){
-        res.redirect("/profile");
+        next()
     } else {
-        res.render("home");
+        res.redirect("/login");
     }
+};
 
-});
+// router.get('/home', (req, res) => {
+
+//     if(req.session.user){
+//         res.redirect("/products");
+//     } else {
+//         res.render("home");
+//     }
+
+// });
 
 router.get('/register', (req, res) => {
     res.render("register");
@@ -31,17 +39,9 @@ router.get('/login', (req, res) => {
 
 });
 
-router.get ("/profile", async (req, res) =>{
-
-    if(req.session.user){
-
-        let user = await UsersDAO.getUserByID(req.session.user);
-        res.render("profile", {user});
-
-    } else {
-        res.redirect("/login");
-    }
-
+router.get("/profile", middleware_auth, async (req, res) => {
+    let user = await UsersDAO.getUserByID(req.session.user);
+    res.render("profile", { user });
 });
 
 export default router;

@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import MongoStore from "connect-mongo";
 import sessionsRouter from './routes/session.js';
 import viewRouter from "./routes/views.js"
+import UsersDAO from "./dao/users.dao.js";
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -49,9 +50,15 @@ app.use(session({
 app.use("/api/sessions", sessionsRouter);
 app.use("/", viewRouter);
 
-
-
-
+// Middleware global para todas las rutas
+app.use(async (req, res, next) => {
+    if (req.session.user) {
+        res.locals.user = await UsersDAO.getUserByID(req.session.user);
+    } else {
+        res.locals.user = null;
+    }
+    next();
+});
 
 
 // Router productos
@@ -77,7 +84,7 @@ app.get("/products/remove", (req, res) => {
 // modelo del carrito
 app.get('/mostrar_carrito', async (req, res) => {
     try {
-      const carrito = await Cart.findOne({ /* condiciones de búsqueda */ });
+      const carrito = await Cart.findOne({ });
       res.json(carrito);
     } catch (error) {
       console.error(error);
