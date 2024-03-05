@@ -12,15 +12,19 @@ import MongoStore from "connect-mongo";
 import sessionsRouter from './routes/session.js';
 import viewRouter from "./routes/views.js"
 import UsersDAO from "./dao/users.dao.js";
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
     return /^[0-9a-fA-F]{24}$/.test(id);
 }
+initializePassport();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server); 
+
 
 
 // View engine
@@ -60,6 +64,9 @@ app.use(async (req, res, next) => {
     next();
 });
 
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Router productos
 app.use("/products", prodsRouter);
