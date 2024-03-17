@@ -4,6 +4,7 @@ import passport from "passport";
 import { createHash } from "../utils/crypt.js";
 import { isValidPassword } from "../utils/crypt.js";
 import GithubStrategy from 'passport-github2';
+import 'dotenv/config';
 
 
 const initializePassport = () => {
@@ -55,8 +56,8 @@ const initializePassport = () => {
     });
 
     passport.use('github', new GithubStrategy({
-        clientID: "Iv1.6dc2d036a561001c",
-        clientSecret: '3e5a5b3457eb897328138951396d3353872f6427',
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
         callbackURL: 'http://localhost:3000/api/sessions/githubcallback',
     }, async (accesstoken, refreshToken, profile, done) => {
         try {
@@ -67,10 +68,12 @@ const initializePassport = () => {
                     first_name: profile._json.name,
                     last_name: '',
                     age: 20,
-                    email: profile._json.name,
-                    password: ''
+                    email: profile._json.email,
+                    password: '',
+                    role: '',
+                    cart: null
                 };
-                let result = await UsersDAO.insert(newUser.first_name, newUser.last_name, newUser.age, newUser.email, newUser.password);
+                let result = await UsersDAO.insert(newUser.first_name, newUser.last_name, newUser.age, newUser.email, newUser.password, newUser.role);
                 done(null, result);
             } else {
                 done(null, user);

@@ -39,9 +39,16 @@ router.get('/login', (req, res) => {
 
 });
 
-router.get("/profile", middleware_auth, async (req, res) => {
-    let user = await UsersDAO.getUserByID(req.session.user);
-    res.render("profile", { user });
+router.get('/profile', middleware_auth, async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const user = await UsersDAO.getUserByID(userId);
+        res.render('profile', { user }); // Pasar el objeto de usuario a la plantilla
+    } catch (error) {
+        console.error('Error al obtener el usuario actual:', error);
+        res.status(500).send('Error interno del servidor');
+    }
 });
+
 
 export default router;
