@@ -4,8 +4,7 @@ import passport from "passport";
 import { createHash } from "../utils/crypt.js";
 import { isValidPassword } from "../utils/crypt.js";
 import GithubStrategy from 'passport-github2';
-import 'dotenv/config';
-
+import config from "./config.js";
 
 const initializePassport = () => {
     
@@ -56,8 +55,8 @@ const initializePassport = () => {
     });
 
     passport.use('github', new GithubStrategy({
-        clientID: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        clientID: config.github.clientId,
+        clientSecret: config.github.clientSecret,
         callbackURL: 'http://localhost:3000/api/sessions/githubcallback',
     }, async (accesstoken, refreshToken, profile, done) => {
         try {

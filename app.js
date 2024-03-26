@@ -14,6 +14,7 @@ import viewRouter from "./routes/views.js"
 import UsersDAO from "./dao/users.dao.js";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
+import config from "./config/config.js";
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -43,10 +44,10 @@ app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 app.use(session({
     store:MongoStore.create({
-        mongoUrl:"mongodb://127.0.0.1:27017/epcilon",
-        ttl: 240,
+        mongoUrl:config.mongoDB.url,
+        ttl: config.session.ttl,
     }),
-    secret:"secretCode",
+    secret: config.session.secret,
     resave: true,
     saveUninitialized: true
 }));
@@ -142,7 +143,7 @@ io.on('connection', (socket) => {
 
 
 // Conexión MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/epcilon");
+mongoose.connect(config.mongoDB.url);
 
 mongoose.connection.on('error', err => {
     console.error('MongoDB Connection Error:', err);
