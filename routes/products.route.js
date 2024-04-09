@@ -3,7 +3,7 @@ import upload from "../utils/upload.middleware.js";
 import ProductsDAO from "../dao/products.dao.js";
 import MessagesDAO from "../dao/db/messages.dao.js";
 import { isValidObjectId } from 'mongoose';
-
+import { checkAdmin, checkUser } from "../utils/permissions.middleware.js";
 
 const router = Router();
 export default router;
@@ -71,7 +71,7 @@ router.get("/", async (req, res) => {
 
 
 // /products/new
-router.get("/new", (req, res) => {
+router.get("/new", checkAdmin, (req, res) => {
     try {
         res.render("new-product");
     } catch (error) {
@@ -82,9 +82,8 @@ router.get("/new", (req, res) => {
 
 
 // Ruta para mostrar el formulario de eliminación
-router.get("/remove", (req, res) => {
+router.get("/remove", checkAdmin, (req, res) => {
     console.log('Intentando renderizar la vista remove-product');
-
     try {
         res.render("remove-product");
         console.log('Vista remove-product renderizada con éxito');
@@ -129,7 +128,7 @@ router.get("/:id", async (req, res) => {
 
 
 
-router.post("/", upload.single('image'), async (req, res) => {
+router.post("/", checkAdmin, upload.single('image'), async (req, res) => {
     try {
         console.log('Archivo de imagen cargado:', req.file);
 
@@ -150,7 +149,7 @@ router.post("/", upload.single('image'), async (req, res) => {
 
 
 // Ruta para mostrar el formulario de eliminación basada en ID
-router.get('/remove/:id', async (req, res) => {
+router.get('/remove/:id', checkAdmin, async (req, res) => {
     const id = req.params.id;
 
     console.log('Llegó a la ruta de remove GET');
@@ -170,7 +169,7 @@ router.get('/remove/:id', async (req, res) => {
 });
 
 // Página principal del chat
-router.get("/chat", (req, res) => {
+router.get("/chat", checkUser, (req, res) => {
     const allMessages = MessagesDAO.getAll();
     res.render("chat", { messages: allMessages });
 });

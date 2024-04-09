@@ -1,28 +1,30 @@
-<h1>Carritos</h1>
- <a href="/" class="home-link" style="margin-top: 10px;">Volver al Inicio</a>
-{{#each carts}}
-    <div>
-        <h2>Carrito {{this._id}}</h2>
-        {{#if this.products.length}}
-            <ul>
-                {{#each this.products}}
-                    <li>
-                        Producto: {{this.title}} -
-                        Cantidad: {{this.quantity}}
-                    </li>
-                {{/each}}
-            </ul>
-            <form method="post" action="/carts/{{this._id}}">
-                <input type="submit" value="Actualizar Carrito">
-            </form>
-            <form method="post" action="/carts/{{this._id}}/remove">
-                <input type="submit" value="Eliminar Carrito">
-            </form>
-        {{else}}
-            <p>El carrito está vacío</p>
-            <script>console.log(this.products)</script>
-        {{/if}}
-    </div>
-{{/each}}
+<h1>Carrito {{cart._id}}</h1>
+<a href="/" class="home-link" style="margin-top: 10px;">Volver al Inicio</a>
+
+{{#if cart.products.length}}
+    <ul>
+        {{#each productIds}}
+            {{#with (lookup ../cart.products @index)}}
+                <li>
+                    Producto: {{this.title}} -
+                    Cantidad: {{this.quantity}}
+                </li>
+            {{/with}}
+        {{/each}}
+    </ul>
+    <form method="post" action="/carts/{{cart._id}}">
+        <input type="submit" value="Actualizar Carrito">
+    </form>
+    <form method="post" action="/carts/{{cart._id}}/remove">
+        <input type="submit" value="Eliminar Carrito">
+    </form>
+    <a href="/carts/{{cart._id}}/purchase" class="purchase-link">Finalizar Compra</a>
+{{else}}
+    <p>El carrito está vacío</p>
+{{/if}}
+
+
+
+
 
 

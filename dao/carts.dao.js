@@ -22,39 +22,52 @@ class CartsDAO {
         }
     }
 
-    static async addToCart(productId, quantity) {
+    static async addToCart(cartId, productId) {
         try {
-            // Lógica para agregar el producto al carrito
-            const cart = await Cart.findOneAndUpdate(
-                {},  // Sin condición para seleccionar un carrito específico
-                { $push: { products: { productId, quantity } } },
-                { upsert: true, new: true }
-            ).populate('products.productId');
-    
-            if (!cart) {
-                throw new Error('No se pudo encontrar ni crear el carrito');
-            }
-    
-            return cart;  // Agrega esta línea para devolver el carrito actualizado
+            // Agregar el producto al carrito del usuario
+            const updatedCart = await Cart.findByIdAndUpdate(
+                cartId,
+                { $push: { products: productId } },
+                { new: true }
+            ).populate('products');
+
+            return updatedCart;
         } catch (error) {
             console.error("Error al agregar al carrito:", error);
             throw error;
         }
     }
-
-    static async getOrCreateCart() {
+    
+    static async getOrCreateCart(userId) {
         try {
-            // Crea un nuevo carrito sin asignar a un usuario específico
-            const newCart = new Cart({ products: [], userId: null }); // Agrega userId: null
-            await newCart.save();
-            return newCart;
+            // Buscar un carrito asociado con el usuario actual
+            let userCart = await Cart.findOne({ userId });
+    
+            // Si no hay un carrito asociado, crear uno nuevo
+            if (!userCart) {
+                userCart = new Cart({ userId, products: [] });
+                await userCart.save();
+            }
+    
+            return userCart;
         } catch (error) {
             console.error('Error al obtener o crear el carrito:', error);
             throw error;
         }
     }
+    
+    static async getCartById(cartId) {
+        try {
+            const cart = await Cart.findById(cartId).populate('products');
+            return cart;
+        } catch (error) {
+            console.error('Error al obtener el carrito:', error);
+            throw error;
+        }
+    }    
 }
 
 export default CartsDAO;
+
 
 
