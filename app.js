@@ -15,6 +15,7 @@ import UsersDAO from "./dao/users.dao.js";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import config from "./config/config.js";
+import generateMockProducts from "./mocking/mocking.js"; // Importa la función para generar productos de prueba
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -25,8 +26,6 @@ initializePassport();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server); 
-
-
 
 // View engine
 app.engine('handlebars', engine());
@@ -39,7 +38,6 @@ app.use(express.static('public'));
 // Middlewares request
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-
 
 app.use(cookieParser());
 app.use(session({
@@ -65,7 +63,6 @@ app.use(async (req, res, next) => {
     next();
 });
 
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -88,7 +85,6 @@ app.get("/products/remove", (req, res) => {
     }
 });
 
-
 // modelo del carrito
 app.get('/mostrar_carrito', async (req, res) => {
     try {
@@ -98,8 +94,19 @@ app.get('/mostrar_carrito', async (req, res) => {
       console.error(error);
       res.status(500).send('Error al obtener el carrito');
     }
-  });
+});
 
+// Ruta para el endpoint /mockingproducts
+app.get('/mockingproducts', async (req, res) => {
+    console.log('Se ha llamado a la ruta /mockingproducts');
+    try {
+        const mockProducts = generateMockProducts(100); // Genera 100 productos de prueba
+        res.json(mockProducts); // Devuelve los productos de prueba en formato JSON
+    } catch (error) {
+        console.error('Error al generar productos de prueba:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
 
 // Home del sitio
 app.get("/", (req, res) => {
@@ -114,17 +121,14 @@ app.get("/ping", (req, res) => {
     res.send("Pong!");
 });
 
-
 app.get("/chat", (req, res) => {
     res.render("chat");
 });
-
 
 // Página error 404
 app.use((req, res, next) => {
     res.render("404");
 });
-
 
 // Manejo de conexiones de socket
 io.on('connection', (socket) => {
@@ -142,6 +146,7 @@ io.on('connection', (socket) => {
 });
 
 
+
 // Conexión MongoDB
 mongoose.connect(config.mongoDB.url);
 
@@ -149,7 +154,8 @@ mongoose.connection.on('error', err => {
     console.error('MongoDB Connection Error:', err);
 });
 
-app.listen(3000, () => {
+// Iniciar el servidor con Socket.IO
+server.listen(3000, () => {
     console.log("App listening on port 3000");
 });
 
