@@ -16,7 +16,7 @@ export const checkUser = (req, res, next) => {
     if (req.user && req.user.role === 'user') {
         return next();
     } else {
-        res.status(403).send(customizeError('PERMISSION_DENIED')); // Utiliza la función customizeError para obtener el mensaje de error
+        res.status(403).send(customizeError('PERMISSION_DENIED2')); // Utiliza la función customizeError para obtener el mensaje de error
     }
 };
 
