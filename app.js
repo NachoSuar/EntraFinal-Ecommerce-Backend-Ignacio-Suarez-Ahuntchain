@@ -15,7 +15,8 @@ import UsersDAO from "./dao/users.dao.js";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import config from "./config/config.js";
-import generateMockProducts from "./mocking/mocking.js"; // Importa la función para generar productos de prueba
+import generateMockProducts from "./mocking/mocking.js";
+import logger from "./loggertest/loggertest.js";
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -60,6 +61,7 @@ app.use(async (req, res, next) => {
     } else {
         res.locals.user = null;
     }
+    logger.debug(`Request received: ${req.method} ${req.url}`);
     next();
 });
 
@@ -108,6 +110,14 @@ app.get('/mockingproducts', async (req, res) => {
     }
 });
 
+// Definición del endpoint /loggerTest
+app.get('/loggerTest', (req, res) => {
+    logger.debug('Mensaje de debug desde /loggerTest');
+    logger.info('Mensaje de info desde /loggerTest');
+    logger.error('Mensaje de error desde /loggerTest');
+    res.send('Logs enviados desde /loggerTest');
+});
+
 // Home del sitio
 app.get("/", (req, res) => {
     res.redirect("/home");
@@ -154,9 +164,11 @@ mongoose.connection.on('error', err => {
     console.error('MongoDB Connection Error:', err);
 });
 
+const PORT = config.port || 3000;
 // Iniciar el servidor con Socket.IO
-server.listen(3000, () => {
-    console.log("App listening on port 3000");
+server.listen(PORT, () => {
+    logger.info(`App listening on port ${PORT}`);
 });
+
 
 export { io };

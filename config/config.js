@@ -14,6 +14,7 @@ const config = {
     secret: process.env.SESSION_SECRET,
     ttl: parseInt(process.env.SESSION_TTL),
   },
+  port: process.env.PORT || 3000,
 };
 
 export default config;
