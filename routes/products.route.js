@@ -3,7 +3,8 @@ import upload from "../utils/upload.middleware.js";
 import ProductsDAO from "../dao/products.dao.js";
 import MessagesDAO from "../dao/db/messages.dao.js";
 import { isValidObjectId } from 'mongoose';
-import { checkAdmin, checkUser } from "../utils/permissions.middleware.js";
+import { checkAdmin, checkUser, checkUserPremiun } from "../utils/permissions.middleware.js";
+import customizeError from "../errorCustom/errorCustom.js";
 
 const router = Router();
 export default router;
@@ -70,8 +71,15 @@ router.get("/", async (req, res) => {
 });
 
 
-// /products/new
-router.get("/new", checkAdmin, (req, res) => {
+router.get("/new", (req, res, next) => {
+    // Verifica si el usuario está autenticado y tiene uno de los roles permitidos
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium')) {
+        return next(); // Permite el acceso
+    } else {
+        // Si el usuario no cumple con los requisitos, envía un mensaje de error
+        res.status(403).send(customizeError('PERMISSION_DENIED3'));
+    }
+}, (req, res) => {
     try {
         res.render("new-product");
     } catch (error) {
@@ -79,6 +87,7 @@ router.get("/new", checkAdmin, (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 
 // Ruta para mostrar el formulario de eliminación
@@ -128,16 +137,31 @@ router.get("/:id", async (req, res) => {
 
 
 
-router.post("/", checkAdmin, upload.single('image'), async (req, res) => {
+router.post("/", (req, res, next) => {
+    // Verifica si el usuario está autenticado y tiene uno de los roles permitidos
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium')) {
+        return next(); // Permite el acceso
+    } else {
+        // Si el usuario no cumple con los requisitos, envía un mensaje de error
+        res.status(403).send(customizeError('PERMISSION_DENIED'));
+    }
+}, upload.single('image'), async (req, res) => {
     try {
         console.log('Archivo de imagen cargado:', req.file);
 
-        let filename = req.file.filename;
-        let product = req.body;
+        // Obtener el nombre del archivo de la imagen cargada
+        const filename = req.file.filename;
 
-        // Llamada al método add de ProductsDAO
-        await ProductsDAO.add(product.title, product.description, filename, product.price, product.stock);
+        // Obtener los datos del producto del cuerpo de la solicitud
+        const { title, description, price, stock } = req.body;
 
+        // Obtener el correo electrónico del usuario autenticado
+        const owner = req.user.email;
+
+        // Llamada al método add de ProductsDAO para agregar el producto
+        await ProductsDAO.add(title, description, filename, price, stock, owner);
+
+        // Redireccionar al usuario a la página de productos después de agregar el producto
         res.redirect("/products");
     } catch (error) {
         console.error('Error al procesar la solicitud de agregar producto:', error);
@@ -146,6 +170,33 @@ router.post("/", checkAdmin, upload.single('image'), async (req, res) => {
 });
 
 
+router.delete("/:id", checkAdmin, checkUserPremiun, async (req, res) => {
+    try {
+        // Obtener el ID del producto de los parámetros de la URL
+        const productId = req.params.id;
+
+        // Obtener el correo electrónico del usuario autenticado
+        const owner = req.user.email;
+
+        // Obtener el producto por su ID
+        const product = await ProductsDAO.getById(productId);
+
+        // Verificar si el producto existe y si el usuario autenticado es el propietario o es administrador
+        if (!product || (product.owner !== owner && req.user.role !== 'admin')) {
+            // Si el producto no existe, o el usuario no es el propietario ni es administrador, enviar un mensaje de error
+            return res.status(403).send("No tienes permiso para eliminar este producto.");
+        }
+
+        // Si el producto existe y el usuario es el propietario o es administrador, eliminar el producto
+        await ProductsDAO.remove(productId);
+
+        // Redireccionar al usuario a la página de productos después de eliminar el producto
+        res.redirect("/products");
+    } catch (error) {
+        console.error('Error al procesar la solicitud de eliminar producto:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
 
 
 // Ruta para mostrar el formulario de eliminación basada en ID
@@ -167,6 +218,7 @@ router.get('/remove/:id', checkAdmin, async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 // Página principal del chat
 router.get("/chat", checkUser, (req, res) => {

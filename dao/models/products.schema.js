@@ -18,6 +18,10 @@ const ProductsSchema = new mongoose.Schema({
     },
     photo:{
         type:String
+    },
+    owner: {
+        type: String,
+        required: true,
     }
 });
 

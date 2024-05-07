@@ -15,6 +15,9 @@ const config = {
     ttl: parseInt(process.env.SESSION_TTL),
   },
   port: process.env.PORT || 3000,
+  gmail: {
+    gmailpass: process.env.GMAIL_PASS,
+  },
 };
 
 export default config;

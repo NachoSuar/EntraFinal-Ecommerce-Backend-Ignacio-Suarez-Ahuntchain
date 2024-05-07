@@ -20,5 +20,12 @@ export const checkUser = (req, res, next) => {
     }
 };
 
+export const checkUserPremiun = (req, res, next) => {
+    if (req.user && req.user.role === 'premium') {
+        return next();
+    } else {
+        res.status(403).send(customizeError('PERMISSION_DENIED2')); 
+    }
+};
 
 

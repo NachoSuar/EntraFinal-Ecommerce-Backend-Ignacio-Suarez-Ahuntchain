@@ -64,9 +64,9 @@ class ProductsDAO {
         }
     }
 
-    static async add(title, description, photo, price, stock) {
+    static async add(title, description, photo, price, stock, owner = "admin") {
         try {
-            return await new Products({ title, description, photo, price, stock }).save();
+            return await new Products({ title, description, photo, price, stock, owner }).save();
         } catch (error) {
             console.error('Error al agregar producto:', error);
             throw error;

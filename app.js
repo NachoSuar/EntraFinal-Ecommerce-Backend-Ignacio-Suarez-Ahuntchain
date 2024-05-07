@@ -17,6 +17,7 @@ import initializePassport from "./config/passport.config.js";
 import config from "./config/config.js";
 import generateMockProducts from "./mocking/mocking.js";
 import logger from "./loggertest/loggertest.js";
+import premiumRoutes from './routes/premium.route.js'
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -73,6 +74,9 @@ app.use("/products", prodsRouter);
 
 // Router Carts
 app.use("/carts", cartsRouter);
+
+// Asociar las rutas premium a /api/users/premium
+app.use('/api/users/premium', premiumRoutes);
 
 // Nueva ruta para eliminar productos
 app.get("/products/remove", (req, res) => {

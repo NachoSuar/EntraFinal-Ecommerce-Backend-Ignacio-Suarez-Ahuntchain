@@ -2,6 +2,7 @@ import express from 'express';
 import CartsDAO from '../dao/carts.dao.js';
 import ProductsDAO from '../dao/products.dao.js';
 import Products from '../dao/models/products.schema.js';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -43,10 +44,16 @@ router.delete('/:cid/products/:pid', async (req, res) => {
 });
 
 
-// Ruta para agregar un producto al carrito
 router.get('/add/:productId', async (req, res) => {
     const productId = req.params.productId;
-    const userId = req.user._id; // Utiliza el ID del usuario autenticado
+
+    // Verifica si el usuario está autenticado
+    if (!req.user) {
+        // Si el usuario no está autenticado, redirige a la página de inicio de sesión o muestra un mensaje de error
+        return res.status(401).send('Debe iniciar sesión para agregar productos al carrito');
+    }
+
+    const userId = req.user._id; // Utiliza el ID del usuario autenticado como ObjectId
 
     // Verifica que el productId no esté vacío antes de continuar
     if (!productId) {
@@ -58,7 +65,7 @@ router.get('/add/:productId', async (req, res) => {
         const userCart = await CartsDAO.getOrCreateCart(userId);
 
         // Agregar el producto al carrito
-        await CartsDAO.addToCart(userCart._id, productId, 1);
+        await CartsDAO.addToCart(userCart._id, productId, new mongoose.Types.ObjectId(userId));
 
         // Redirigir o enviar una respuesta adecuada según tu aplicación
         res.redirect('/carts');
@@ -67,6 +74,8 @@ router.get('/add/:productId', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
+
 
 export default router;
 

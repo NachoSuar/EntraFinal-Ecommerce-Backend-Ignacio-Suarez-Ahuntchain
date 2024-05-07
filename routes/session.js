@@ -3,6 +3,8 @@ import UsersDAO from "../dao/users.dao.js";
 import { createHash, isValidPassword } from "../utils/crypt.js";
 import passport from "passport";
 import viewRouter from "./views.js";
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 
 const router = Router()
 
@@ -33,7 +35,6 @@ router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/
     req.session.user = req.user;
     res.redirect('/products');
 });
-
 
 // Logout
 router.get("/logout", (req, res) => {
