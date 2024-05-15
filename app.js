@@ -18,6 +18,10 @@ import config from "./config/config.js";
 import generateMockProducts from "./mocking/mocking.js";
 import logger from "./loggertest/loggertest.js";
 import premiumRoutes from './routes/premium.route.js'
+import swaggerRouter from "./swagger.js";
+import swaggerSpec from "./swagger.js";
+import swaggerUi from "swagger-ui-express";
+
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -54,6 +58,10 @@ app.use(session({
 
 app.use("/api/sessions", sessionsRouter);
 app.use("/", viewRouter);
+
+//Swagger
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec));
 
 // Middleware global para todas las rutas
 app.use(async (req, res, next) => {

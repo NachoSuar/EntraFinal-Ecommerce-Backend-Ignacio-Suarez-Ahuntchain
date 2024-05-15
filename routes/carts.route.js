@@ -6,6 +6,31 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Carts
+ *   description: Cart management
+ */
+
+/**
+ * @swagger
+ * /carts:
+ *   get:
+ *     summary: Devuelve el carrito del usuario autenticado
+ *     tags: [Carts]
+ *     responses:
+ *       200:
+ *         description: A user's cart
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cart'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 
 router.get('/', async (req, res) => {
     try {
@@ -26,7 +51,33 @@ router.get('/', async (req, res) => {
 });
 
 
-
+/**
+ * @swagger
+ * /carts/{cid}/products/{pid}:
+ *   delete:
+ *     summary: Remueve un producto del carrito
+ *     tags: [Carts]
+ *     parameters:
+ *       - in: path
+ *         name: cid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The cart ID
+ *       - in: path
+ *         name: pid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The product ID
+ *     responses:
+ *       200:
+ *         description: Product removed from cart
+ *       404:
+ *         description: Cart or product not found
+ *       500:
+ *         description: Internal server error
+ */
 
 
 // Ruta para eliminar un producto del carrito
@@ -43,6 +94,27 @@ router.delete('/:cid/products/:pid', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /carts/add/{productId}:
+ *   get:
+ *     summary: Agrega un producto al carrito
+ *     tags: [Carts]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The product ID
+ *     responses:
+ *       200:
+ *         description: Product added to cart
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 
 router.get('/add/:productId', async (req, res) => {
     const productId = req.params.productId;

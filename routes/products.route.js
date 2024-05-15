@@ -9,6 +9,65 @@ import customizeError from "../errorCustom/errorCustom.js";
 const router = Router();
 export default router;
 
+/**
+ * @swagger
+ * tags:
+ *   name: Products
+ *   description: Product management
+ */
+
+/**
+ * @swagger
+ * /products:
+ *   get:
+ *     summary: Devuelve la lista de productos
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: stock
+ *         schema:
+ *           type: boolean
+ *         description: Only return products with stock
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of products to return
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *         description: Search query
+ *     responses:
+ *       200:
+ *         description: A list of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 payload:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ */
+
 // /products -> Muestro todos los productos
 // /products?stock -> Muestre todos los productos con stock
 router.get("/", async (req, res) => {
@@ -70,6 +129,20 @@ router.get("/", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /products/new:
+ *   get:
+ *     summary: Renderiza el formulario para crear un nuevo producto
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: New product form
+ *       403:
+ *         description: Permission denied
+ *       500:
+ *         description: Internal server error
+ */
 
 router.get("/new", (req, res, next) => {
     // Verifica si el usuario está autenticado y tiene uno de los roles permitidos
@@ -88,7 +161,20 @@ router.get("/new", (req, res, next) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /products/remove:
+ *   get:
+ *     summary: Muestra el formulario para eliminar un producto
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Remove product form
+ *       403:
+ *         description: Permission denied
+ *       500:
+ *         description: Internal server error
+ */
 
 // Ruta para mostrar el formulario de eliminación
 router.get("/remove", checkAdmin, (req, res) => {
@@ -102,6 +188,29 @@ router.get("/remove", checkAdmin, (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Recupera un solo producto por ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The product ID
+ *     responses:
+ *       200:
+ *         description: A single product
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ */
 
 // /products/:id (Visualizar un producto)
 router.get("/:id", async (req, res) => {
@@ -135,7 +244,36 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: Crea un nuevo producto
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               stock:
+ *                 type: number
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Product created
+ *       500:
+ *         description: Internal server error
+ */
 
 router.post("/", (req, res, next) => {
     // Verifica si el usuario está autenticado y tiene uno de los roles permitidos
@@ -169,6 +307,25 @@ router.post("/", (req, res, next) => {
     }
 });
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: Elimina un producto
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The product ID
+ *     responses:
+ *       200:
+ *         description: Product deleted
+ *       404:
+ *         description: Product not found
+ */
 
 router.delete("/:id", checkAdmin, checkUserPremiun, async (req, res) => {
     try {
