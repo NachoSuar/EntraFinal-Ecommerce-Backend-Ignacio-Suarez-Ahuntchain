@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../app.js';
 import { assert } from 'chai';
-import usersSchema from '../dao/models/users.schema.js'; // Importa el modelo de Usuario
+import usersSchema from '../dao/models/users.schema.js';
 import Cart from '../dao/models/cart.schema.js';
 
 describe('Carts Router', () => {

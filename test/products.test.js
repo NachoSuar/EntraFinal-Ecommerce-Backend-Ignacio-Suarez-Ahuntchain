@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../app.js';
 import { assert } from 'chai';
-import Products from '../dao/models/products.schema.js'; // Importa el modelo de Producto
+import Products from '../dao/models/products.schema.js';
 import mongoose from 'mongoose';
 
 describe('Products Router', () => {
