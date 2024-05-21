@@ -1,0 +1,21 @@
+// id = 1?
+<a href="locarlhost:3000/auth/resetPwd?cifrado">Reestablecer contraseña</a>
+
+app.get("/auth/resetPwd/:token",(req, res) => { 
+    let id, datetime = decifrar(token)
+
+    if (datetime.now - datetime > 1 hora){
+        error
+    } else {
+        //Reseteo pwd
+    }
+});
+
+// Generar email de reseteo de pwd 
+app.get("/auth/recoverPwd", (req, res )) =>{
+    let link = cifrar(usuario, datetime.now())
+    mandarEmail(usuario, link)
+}
+
+user: 'epcilon.resetpwd@gmail.com',
+pass: 'xbgz wyce uxye mlho'

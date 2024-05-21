@@ -34,7 +34,13 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const userId = req.user._id; // Obtener el userId de la solicitud (de tu lógica de autenticación)
+        // Verificar si req.user está definido
+        if (!req.user) {
+            // Si no está definido, devolver un error 401 (Unauthorized)
+            return res.status(401).send('Debe iniciar sesión para ver su carrito');
+        }
+
+        const userId = req.user._id;
 
         // Obtener el carrito asociado al userId
         const userCart = await CartsDAO.getOrCreateCart(userId);
@@ -49,6 +55,7 @@ router.get('/', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 
 /**

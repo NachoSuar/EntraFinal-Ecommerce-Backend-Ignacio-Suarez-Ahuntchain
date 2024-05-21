@@ -182,5 +182,5 @@ server.listen(PORT, () => {
     logger.info(`App listening on port ${PORT}`);
 });
 
-
+export default app;
 export { io };

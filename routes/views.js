@@ -50,15 +50,6 @@ router.get('/profile', middleware_auth, async (req, res) => {
     }
 });
 
-router.get("/forgot-password", (req, res) => {
-    console.log("Renderizando el formulario de restablecimiento de contraseña...");
-    res.render("reset-password"); // Renderizar el formulario de restablecimiento de contraseña
-});
-
-router.get("/recoverPwd", (req, res) => {
-    console.log("Renderizando la página de confirmación de correo electrónico enviado...");
-    res.render("forgot-password"); // Renderizar la página de confirmación de correo electrónico enviado
-});
 
 router.get("/ejemplo", (req, res) => {
     console.log("Renderizando el formulario de restablecimiento de contraseña...");
