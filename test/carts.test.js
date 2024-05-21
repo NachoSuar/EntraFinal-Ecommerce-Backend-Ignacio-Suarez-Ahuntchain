@@ -14,11 +14,10 @@ describe('Carts Router', () => {
             .end((err, res) => {
                 if (err) return done(err);
                 assert.isObject(res.body);
-                // Agrega más aserciones según la estructura de tu carrito
                 done();
             });
     });
 
-    // Agrega más pruebas según sea necesario para las operaciones CRUD de carritos
+
 });
 
