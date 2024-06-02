@@ -16,8 +16,21 @@ router.get("/failregister", (req,res) => {
     res.send({error:"Failed register"});
 })
 
-router.post("/login", passport.authenticate("login", {failureRedirect:"/faillogin"}), async (req,res) => {
-    
+// Middleware para actualizar last_connection
+const updateLastConnection = async (req, res, next) => {
+    const userId = req.session.user;
+    try {
+        // Actualizar la propiedad last_connection del usuario en la base de datos
+        await UsersDAO.updateLastConnection(userId);
+        next();
+    } catch (error) {
+        console.error('Error al actualizar last_connection:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+};
+
+// Ruta de inicio de sesión
+router.post("/login", passport.authenticate("login", {failureRedirect:"/faillogin"}), updateLastConnection, async (req,res) => {
     if(!req.user) {
         return res.redirect("/login");
     }
@@ -36,8 +49,8 @@ router.get('/githubcallback', passport.authenticate('github',{failureRedirect:'/
     res.redirect('/products');
 });
 
-// Logout
-router.get("/logout", (req, res) => {
+// Ruta de cierre de sesión
+router.get("/logout", updateLastConnection, (req, res) => {
     req.session.destroy((err) => {
         res.redirect("/home");
     });

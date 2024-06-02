@@ -17,11 +17,10 @@ import initializePassport from "./config/passport.config.js";
 import config from "./config/config.js";
 import generateMockProducts from "./mocking/mocking.js";
 import logger from "./loggertest/loggertest.js";
-import premiumRoutes from './routes/premium.route.js'
 import swaggerRouter from "./swagger.js";
 import swaggerSpec from "./swagger.js";
 import swaggerUi from "swagger-ui-express";
-
+import usersRouter from "./routes/users.router.js";
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -83,8 +82,14 @@ app.use("/products", prodsRouter);
 // Router Carts
 app.use("/carts", cartsRouter);
 
-// Asociar las rutas premium a /api/users/premium
-app.use('/api/users/premium', premiumRoutes);
+// Router Usuarios
+app.use("/api/users", usersRouter);
+
+app.get('/formulario', (req, res) => {
+    // Lógica para renderizar el formulario
+    res.render('formulario');
+});
+
 
 // Nueva ruta para eliminar productos
 app.get("/products/remove", (req, res) => {

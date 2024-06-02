@@ -8,6 +8,12 @@
 <a href="/" class="home-link">Volver al Inicio</a>
 <a href="/api/sessions/logout">Logout</a>
 
-<!-- Agrega un botón o un enlace que el usuario pueda hacer clic para cambiar su rol a premium -->
-<a href="/api/users/premium/{{user._id}}">Convertirse en Premium</a>
+<a href="/formulario">Subir Documentos</a>
+<form action="/premium/{{user._id}}" method="PUT">
+    <button type="submit">Convertirse en Premium</button>
+</form>
+
+
+
+
 

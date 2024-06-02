@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Archivo</title>
+</head>
+<body>
+    <h2>Subir Archivo</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="profile" id="profileInput">
+        <input type="file" name="document" id="documentInput" multiple>
+        <button type="submit">Subir Archivo</button>
+    </form>
+    <div id="message"></div>
+    <a href="/home">Volver al inicio</a>
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Evita que el formulario se envíe automáticamente
+
+            const profileInput = document.getElementById('profileInput');
+            const profileFile = profileInput.files[0];
+
+            const documentInput = document.getElementById('documentInput');
+            const documentFiles = documentInput.files;
+
+            const formData = new FormData();
+            if (profileFile) {
+                formData.append('profile', profileFile);
+            }
+            for (const file of documentFiles) {
+                formData.append('document', file);
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/users/665b9f8e6847566beb074883/documents', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    document.getElementById('message').textContent = 'Archivo(s) subido(s) exitosamente.';
+                } else {
+                    throw new Error('Error al subir archivo(s).');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'Error al subir archivo(s).';
+            }
+        });
+    </script>
+</body>
+</html>

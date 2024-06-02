@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+const DocumentSchema = new mongoose.Schema({
+    name: String,
+    reference: String,
+});
+
 const UserSchema = new mongoose.Schema({
     first_name: {
         type: String,
@@ -39,6 +44,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
     },
     resetPasswordExpires: {
+        type: Date,
+    },
+    documents: [DocumentSchema],
+    last_connection: {
         type: Date,
     }
 });
