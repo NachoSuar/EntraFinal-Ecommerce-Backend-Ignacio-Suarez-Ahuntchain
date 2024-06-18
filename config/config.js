@@ -8,7 +8,7 @@ const config = {
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
   },
   mongoDB: {
-    url: process.env.MONGODB_URL,
+    url: process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017/epcilon',
   },
   session: {
     secret: process.env.SESSION_SECRET,

@@ -271,13 +271,18 @@ io.on('connection', (socket) => {
 });
 
 // Conexión MongoDB
-mongoose.connect(config.mongoDB.url);
+mongoose.connect(config.mongoDB.url)
 
+// Escuchar eventos de conexión y error
 mongoose.connection.on('error', err => {
     console.error('MongoDB Connection Error:', err);
-});
+  });
+  
+mongoose.connection.once('open', () => {
+    console.log('MongoDB connection opened successfully');
+  });
 
-const PORT = config.port || 3000;
+const PORT = config.port;
 // Iniciar el servidor con Socket.IO
 server.listen(PORT, () => {
     logger.info(`App listening on port ${PORT}`);
