@@ -101,7 +101,7 @@ router.post('/:id/changeRoleToAdmin', (req, res, next) => {
     }
 });
 
-// //pato
+// //pato (Este es un ejemplo divertido que use para testear el funcionamiento)
 // router.post('/:id/changeRoleToPato', (req, res, next) => {
 //     const userId = req.params.id;
 //     console.log('ID del usuario recibido en la solicitud:', userId);
