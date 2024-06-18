@@ -129,34 +129,35 @@ class UsersDAO {
         }
     }
 
-    static async changeUserRoleToPato(userId) {
-        try {
-            console.log(`Verificando ID: ${userId}`); // Log de verificación
+    // (Este es un ejemplo divertido que use para testear el funcionamiento)
+    // static async changeUserRoleToPato(userId) {
+    //     try {
+    //         console.log(`Verificando ID: ${userId}`); // Log de verificación
 
-            if (!mongoose.Types.ObjectId.isValid(userId)) {
-                console.error(`ID inválido: ${userId}`);
-                throw new Error('El ID de usuario proporcionado no es válido');
-            }
+    //         if (!mongoose.Types.ObjectId.isValid(userId)) {
+    //             console.error(`ID inválido: ${userId}`);
+    //             throw new Error('El ID de usuario proporcionado no es válido');
+    //         }
 
-            console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
-            const user = await Users.findById(userId);
+    //         console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
+    //         const user = await Users.findById(userId);
 
-            if (!user) {
-                console.error(`Usuario no encontrado con ID: ${userId}`);
-                throw new Error('No se encontró al usuario');
-            }
+    //         if (!user) {
+    //             console.error(`Usuario no encontrado con ID: ${userId}`);
+    //             throw new Error('No se encontró al usuario');
+    //         }
 
-            console.log(`Usuario encontrado: ${user}`); // Log de verificación
-            user.role = "pato";
-            await user.save();
+    //         console.log(`Usuario encontrado: ${user}`); // Log de verificación
+    //         user.role = "pato";
+    //         await user.save();
 
-            console.log(`Rol del usuario actualizado: ${user.role}`); // Log de verificación
-            return user;
-        } catch (error) {
-            console.error('Error al cambiar el role del usuario a "pato":', error);
-            throw error;
-        }
-    }
+    //         console.log(`Rol del usuario actualizado: ${user.role}`); // Log de verificación
+    //         return user;
+    //     } catch (error) {
+    //         console.error('Error al cambiar el role del usuario a "pato":', error);
+    //         throw error;
+    //     }
+    // }
 
     // Método para obtener todos los usuarios con solo los datos principales
     static async getAllUsers() {

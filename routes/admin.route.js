@@ -101,23 +101,23 @@ router.post('/:id/changeRoleToAdmin', (req, res, next) => {
     }
 });
 
-//pato
-router.post('/:id/changeRoleToPato', (req, res, next) => {
-    const userId = req.params.id;
-    console.log('ID del usuario recibido en la solicitud:', userId);
-    next();
-}, async (req, res) => {
-    const userId = req.params.id;
+// //pato
+// router.post('/:id/changeRoleToPato', (req, res, next) => {
+//     const userId = req.params.id;
+//     console.log('ID del usuario recibido en la solicitud:', userId);
+//     next();
+// }, async (req, res) => {
+//     const userId = req.params.id;
 
-    try {
-        const updatedUser = await UsersDAO.changeUserRoleToPato(userId);
-        console.log('Usuario actualizado:', updatedUser);
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        console.error('Error al cambiar el rol del usuario a "pato":', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
-});
+//     try {
+//         const updatedUser = await UsersDAO.changeUserRoleToPato(userId);
+//         console.log('Usuario actualizado:', updatedUser);
+//         res.status(200).json(updatedUser);
+//     } catch (error) {
+//         console.error('Error al cambiar el rol del usuario a "pato":', error);
+//         res.status(500).json({ error: 'Error interno del servidor' });
+//     }
+// });
 
 
 // Ruta para eliminar un usuario
