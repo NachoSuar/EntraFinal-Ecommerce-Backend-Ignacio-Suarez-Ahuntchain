@@ -30,20 +30,32 @@ class CartsDAO {
 
     static async addToCart(cartId, productId, userId) {
         try {
+            // Obtener el producto completo, incluido su título y precio
+            const product = await ProductsDAO.getById(productId);
+            if (!product) {
+                throw new Error('Producto no encontrado');
+            }
+    
             // Verificar si el usuario es premium
             const user = await UsersDAO.getUserByID(userId);
-            if (user.role === 'premium') {
-                // Obtener el producto completo, incluido su título y precio
-                const product = await ProductsDAO.getById(productId);
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
     
-                // Verificar si product.owner existe y si el producto pertenece al usuario
-                if (product.owner && product.owner.equals(userId)) {
-                    throw new Error('Un usuario premium no puede agregar su propio producto al carrito.');
+            // Verificar si el usuario es premium
+            if (user.role === 'premium') {
+                // Obtener el producto
+                const product = await ProductsDAO.getById(productId);
+                if (!product) {
+                    return res.status(404).send('Producto no encontrado');
+                }
+
+                // Verificar si el producto tiene propietario y si es el mismo usuario premium
+                if (product.owner === user.email) {
+                    return res.status(403).send('Un usuario premium no puede agregar su propio producto al carrito.');
                 }
             }
     
-            // Obtener el producto completo, incluido su título y precio
-            const product = await ProductsDAO.getById(productId);
             const { title, price } = product; // Extraer el título y el precio del producto
     
             // Agregar el producto al carrito del usuario
@@ -59,6 +71,10 @@ class CartsDAO {
             throw error;
         }
     }
+    
+    
+    
+    
     
     
     
