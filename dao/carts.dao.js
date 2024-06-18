@@ -33,19 +33,25 @@ class CartsDAO {
             // Verificar si el usuario es premium
             const user = await UsersDAO.getUserByID(userId);
             if (user.role === 'premium') {
-                // Verificar si el producto pertenece al usuario
+                // Obtener el producto completo, incluido su título y precio
                 const product = await ProductsDAO.getById(productId);
-                if (product.owner === userId) {
+    
+                // Verificar si product.owner existe y si el producto pertenece al usuario
+                if (product.owner && product.owner.equals(userId)) {
                     throw new Error('Un usuario premium no puede agregar su propio producto al carrito.');
                 }
             }
     
+            // Obtener el producto completo, incluido su título y precio
+            const product = await ProductsDAO.getById(productId);
+            const { title, price } = product; // Extraer el título y el precio del producto
+    
             // Agregar el producto al carrito del usuario
             const updatedCart = await Cart.findByIdAndUpdate(
                 cartId,
-                { $push: { products: productId } },
+                { $push: { products: { productId, title, price, quantity: 1 } } },
                 { new: true }
-            ).populate('products');
+            ).populate('products.productId');
     
             return updatedCart;
         } catch (error) {
@@ -56,10 +62,39 @@ class CartsDAO {
     
     
     
+    
+    
+    
+    
+    static async updateCart(cartId, products) {
+        try {
+            const updatedCart = await Cart.findByIdAndUpdate(
+                cartId,
+                { products },
+                { new: true }
+            ).populate('products.productId');
+            return updatedCart;
+        } catch (error) {
+            console.error('Error al actualizar el carrito:', error);
+            throw error;
+        }
+    }
+
+    static async removeCart(cartId) {
+        try {
+            const result = await Cart.findByIdAndDelete(cartId);
+            return result;
+        } catch (error) {
+            console.error('Error al eliminar el carrito:', error);
+            throw error;
+        }
+    }
+    
+    
     static async getOrCreateCart(userId) {
         try {
             // Buscar un carrito asociado con el usuario actual
-            let userCart = await Cart.findOne({ userId });
+            let userCart = await Cart.findOne({ userId }).populate('products');
     
             // Si no hay un carrito asociado, crear uno nuevo
             if (!userCart) {
@@ -72,18 +107,19 @@ class CartsDAO {
             console.error('Error al obtener o crear el carrito:', error);
             throw error;
         }
-    }
+    }    
     
     static async getCartById(cartId) {
         try {
-            const cart = await Cart.findById(cartId).populate('products');
+            const cart = await Cart.findById(cartId).populate('products.productId');
             return cart;
         } catch (error) {
             console.error('Error al obtener el carrito:', error);
             throw error;
         }
-    }    
-}
+    }
+      
+};
 
 export default CartsDAO;
 

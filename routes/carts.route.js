@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
         const userCart = await CartsDAO.getOrCreateCart(userId);
 
         // Obtener los IDs de los productos asociados al carrito
-        const productIds = userCart.products.map(product => product.productId);
+        const productIds = userCart.products.map(product => product._id);
 
         // Renderizar la plantilla con los datos del carrito y los IDs de los productos
         res.render('carritos', { cart: userCart, productIds });
@@ -126,31 +126,70 @@ router.delete('/:cid/products/:pid', async (req, res) => {
 router.get('/add/:productId', async (req, res) => {
     const productId = req.params.productId;
 
-    // Verifica si el usuario está autenticado
     if (!req.user) {
-        // Si el usuario no está autenticado, redirige a la página de inicio de sesión o muestra un mensaje de error
         return res.status(401).send('Debe iniciar sesión para agregar productos al carrito');
     }
 
-    const userId = req.user._id; // Utiliza el ID del usuario autenticado como ObjectId
+    const userId = req.user._id;
 
-    // Verifica que el productId no esté vacío antes de continuar
     if (!productId) {
         return res.status(400).send('Error: productId no válido');
     }
 
     try {
-        // Obtener o crear el carrito para el usuario
+        // Obtener o crear el carrito del usuario
         const userCart = await CartsDAO.getOrCreateCart(userId);
 
         // Agregar el producto al carrito
-        await CartsDAO.addToCart(userCart._id, productId, new mongoose.Types.ObjectId(userId));
+        await CartsDAO.addToCart(userCart._id, productId, userId);
 
-        // Redirigir o enviar una respuesta adecuada según tu aplicación
         res.redirect('/carts');
     } catch (error) {
         console.error('Error al agregar el producto al carrito:', error);
         res.status(500).send('Error interno del servidor');
+    }
+});
+
+
+
+
+
+
+router.post('/:cid', async (req, res) => {
+    const cartId = req.params.cid;
+    const { products } = req.body; // Se espera que el formulario envíe los productos actualizados
+
+    try {
+        const updatedCart = await CartsDAO.updateCart(cartId, products);
+        res.redirect('/carts');
+    } catch (error) {
+        console.error('Error al actualizar el carrito:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+router.post('/:cartId/remove', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        await CartsDAO.removeCart(cartId);
+        res.redirect('/carts'); // O redirige a donde necesites después de eliminar el carrito
+    } catch (error) {
+        console.error('Error al eliminar el carrito:', error);
+        res.status(500).send('Error al eliminar el carrito');
+    }
+});
+
+
+
+router.get('/carts/:cartId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const cart = await CartsDAO.getCartById(cartId);
+        console.log('Carrito:', JSON.stringify(cart, null, 2)); // Esto imprimirá el carrito en la consola
+        res.render('cart', { cart });
+    } catch (error) {
+        console.error('Error al obtener el carrito:', error);
+        res.status(500).send('Error al obtener el carrito');
     }
 });
 

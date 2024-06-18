@@ -14,10 +14,10 @@ const config = {
     secret: process.env.SESSION_SECRET,
     ttl: parseInt(process.env.SESSION_TTL),
   },
-  port: process.env.PORT || 3000,
   gmail: {
     gmailpass: process.env.GMAIL_PASS,
   },
+  port: process.env.PORT || 3000,
 };
 
 export default config;

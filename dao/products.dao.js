@@ -3,7 +3,7 @@ import Cart from "./models/cart.schema.js";
 import Message from "./models/message.schema.js";
 import mongoose from 'mongoose';
 import { isValidObjectId } from 'mongoose';
-
+import { sendEmail } from "../utils/email.js";
 
 class ProductsDAO {
 
@@ -50,20 +50,20 @@ class ProductsDAO {
             if (!mongoose.isValidObjectId(id)) {
                 throw new Error('ID de producto no válido');
             }
-
+    
             const product = await Products.findOne({ _id: id }).lean();
-
+    
             if (!product) {
                 throw new Error('Producto no encontrado');
             }
-
+    
             return product;
         } catch (error) {
             console.error("Error en getById:", error);
             throw error;
         }
     }
-
+    
     static async add(title, description, photo, price, stock, owner = "admin") {
         try {
             return await new Products({ title, description, photo, price, stock, owner }).save();
@@ -89,6 +89,13 @@ class ProductsDAO {
             if (!removedProduct) {
                 throw new Error('Producto no encontrado');
             }
+            try {
+                await sendEmail(removedProduct.owner, 'Tu producto ha sido eliminado', `Lo sentimos, tu producto "${removedProduct.title}" ha sido eliminado.`);
+                console.log(`Email enviado a ${removedProduct.owner}`);
+            } catch (error) {
+                console.error(`Error al enviar el correo electrónico a ${removedProduct.owner}:`, error);
+            }
+
             return removedProduct;
         } catch (error) {
             console.error("Error en remove:", error);

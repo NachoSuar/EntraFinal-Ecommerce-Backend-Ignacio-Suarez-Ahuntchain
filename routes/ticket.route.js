@@ -1,17 +1,19 @@
 import express from 'express';
 import CartsDAO from '../dao/carts.dao.js';
 import ProductsDAO from '../dao/products.dao.js';
-import Ticket from '../models/TicketSchema.js';
+import TicketDAO from '../dao/ticket.dao.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
 
 router.post('/:cid/purchase', async (req, res) => {
   try {
     const cartId = req.params.cid;
-    const userId = req.user._id;
+    const userEmail = req.user.email;
     const userCart = await CartsDAO.getCartById(cartId);
     const productsToPurchase = userCart.products;
-
+    const totalAmount = req.body.totalAmount;
+    
     const purchasedProducts = [];
     const productsNotPurchased = [];
 
@@ -19,46 +21,38 @@ router.post('/:cid/purchase', async (req, res) => {
       const availableProduct = await ProductsDAO.getById(product.productId);
 
       if (availableProduct.stock >= product.quantity) {
-        // El producto tiene suficiente stock, restarlo del inventario
         availableProduct.stock -= product.quantity;
         await availableProduct.save();
-
-        // Agregar el producto a la lista de productos comprados
         purchasedProducts.push(product);
       } else {
-        // No hay suficiente stock del producto, agregar a la lista de productos no comprados
         productsNotPurchased.push(product.productId);
       }
     }
 
-    // Crear un nuevo ticket con los datos de la compra
-    const ticket = new Ticket({
-      code: generateUniqueCode(),
-      amount: calculateTotalAmount(purchasedProducts),
-      purchaser: req.user.email
-    });
-    await ticket.save();
+    const code = generateUniqueCode(); // Generar el código único
+    const ticketData = {
+      code: code,
+      amount: totalAmount,
+      purchaser: userEmail
+    };
+    
+    // Crear un ticket con el código generado
+    const ticket = await TicketDAO.createTicket(ticketData);
 
-    // Actualizar el carrito con los productos que no se pudieron comprar
-    await CartsDAO.updateCartWithNotPurchasedProducts(cartId, productsNotPurchased);
-
-    res.status(200).json({ message: 'Compra realizada con éxito', ticket });
+    // Redirigir a la página de confirmación de compra con el código pasado como parámetro
+    const redirectUrl = `/carts/${cartId}/purchase_confirmation?code=${code}`;
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error('Error al finalizar la compra:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
-// Función para generar un código único para el ticket
 function generateUniqueCode() {
-  // lógica para generar un código único a definir posiblemente use ShortId
+  return uuidv4().toUpperCase();
 }
 
-// Función para calcular el monto total de la compra
-function calculateTotalAmount(products) {
-    let totalAmount = 0;
-    for (const product of products) {
-        totalAmount += product.price * product.quantity;
-    }
-    return totalAmount;
-}
+export default router;
+
+
+

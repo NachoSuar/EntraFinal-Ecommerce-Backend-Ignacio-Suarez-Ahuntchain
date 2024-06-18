@@ -146,11 +146,11 @@ router.get("/", async (req, res) => {
 
 router.get("/new", (req, res, next) => {
     // Verifica si el usuario está autenticado y tiene uno de los roles permitidos
-    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium')) {
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium'|| req.user.role === 'user')) {
         return next(); // Permite el acceso
     } else {
         // Si el usuario no cumple con los requisitos, envía un mensaje de error
-        res.status(403).send(customizeError('PERMISSION_DENIED3'));
+        res.status(403).send(customizeError('PERMISSION_DENIED4'));
     }
 }, (req, res) => {
     try {
@@ -177,13 +177,12 @@ router.get("/new", (req, res, next) => {
  */
 
 // Ruta para mostrar el formulario de eliminación
-router.get("/remove", checkAdmin, (req, res) => {
-    console.log('Intentando renderizar la vista remove-product');
+router.get('/remove',checkAdmin, async (req, res) => {
     try {
-        res.render("remove-product");
-        console.log('Vista remove-product renderizada con éxito');
+        const products = await ProductsDAO.getAll(10, 0, 1); // Ajusta los parámetros según tus necesidades
+        res.render('adminProducts', { productos: products });
     } catch (error) {
-        console.error('Error al renderizar la vista remove-product:', error);
+        console.error('Error al obtener productos:', error);
         res.status(500).send('Error interno del servidor');
     }
 });
@@ -277,11 +276,11 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", (req, res, next) => {
     // Verifica si el usuario está autenticado y tiene uno de los roles permitidos
-    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium')) {
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium' || req.user.role === 'user')) {
         return next(); // Permite el acceso
     } else {
         // Si el usuario no cumple con los requisitos, envía un mensaje de error
-        res.status(403).send(customizeError('PERMISSION_DENIED'));
+        res.status(403).send(customizeError('PERMISSION_DENIED4'));
     }
 }, upload.single('image'), async (req, res) => {
     try {
@@ -327,34 +326,36 @@ router.post("/", (req, res, next) => {
  *         description: Product not found
  */
 
-router.delete("/:id", checkAdmin, checkUserPremiun, async (req, res) => {
+router.delete("/api/products/:id", checkAdmin, async (req, res) => {
     try {
-        // Obtener el ID del producto de los parámetros de la URL
         const productId = req.params.id;
-
-        // Obtener el correo electrónico del usuario autenticado
         const owner = req.user.email;
-
-        // Obtener el producto por su ID
         const product = await ProductsDAO.getById(productId);
 
-        // Verificar si el producto existe y si el usuario autenticado es el propietario o es administrador
         if (!product || (product.owner !== owner && req.user.role !== 'admin')) {
-            // Si el producto no existe, o el usuario no es el propietario ni es administrador, enviar un mensaje de error
             return res.status(403).send("No tienes permiso para eliminar este producto.");
         }
 
-        // Si el producto existe y el usuario es el propietario o es administrador, eliminar el producto
         await ProductsDAO.remove(productId);
-
-        // Redireccionar al usuario a la página de productos después de eliminar el producto
-        res.redirect("/products");
+        res.redirect("/admin/products");
     } catch (error) {
         console.error('Error al procesar la solicitud de eliminar producto:', error);
         res.status(500).send('Error interno del servidor');
     }
 });
 
+router.post('/:id/delete', async (req, res) => {
+    const productId = req.params.id;
+
+    try {
+        const deletedProduct = await ProductsDAO.remove(productId);
+        console.log('Producto eliminado:', deletedProduct);
+        res.redirect('/products/remove'); // Redirecciona después de la eliminación
+    } catch (error) {
+        console.error('Error al eliminar el producto:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
 
 // Ruta para mostrar el formulario de eliminación basada en ID
 router.get('/remove/:id', checkAdmin, async (req, res) => {
@@ -407,6 +408,16 @@ router.post("/chat", (req, res) => {
     }
 });
 
+// Ruta para mostrar la página de administración de productos
+router.get('/admin/products', async (req, res) => {
+    try {
+        const products = await ProductsDAO.getAll(10, 0, 1); // Ajusta los parámetros según tus necesidades
+        res.render('adminProducts', { productos: products });
+    } catch (error) {
+        console.error('Error al obtener productos:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
 
 
 

@@ -1,4 +1,6 @@
 import Users from "./models/users.schema.js";
+import mongoose from "mongoose";
+import { sendEmail } from "../utils/email.js";
 
 class UsersDAO {
     static async getUserByEmail(email){
@@ -21,22 +23,8 @@ class UsersDAO {
         return await Users.updateOne({ _id: id }, { $push: { documents: { $each: documents } } });
     }
 
-    // Método para actualizar el rol del usuario
-    static async updateRole(userId, newRole) {
-        try {
-            console.log(`Actualizando rol del usuario ${userId} a ${newRole}`);
-            // Actualizar el rol del usuario en la base de datos
-            await Users.findByIdAndUpdate(userId, { role: newRole });
+    
 
-            // Mensaje de registro para verificar que se actualizó el rol correctamente
-            console.log(`Rol del usuario ${userId} actualizado a ${newRole}`);
-
-            // No es necesario devolver ningún valor, ya que la actualización se realizó con éxito
-        } catch (error) {
-            console.error('Error al actualizar el rol del usuario:', error);
-            throw error;
-        }
-    }
 
     // Método para actualizar la última conexión del usuario
     static async updateLastConnection(userId) {
@@ -50,6 +38,202 @@ class UsersDAO {
             throw error;
         }
     }
+
+    //Cambiar Rol a User
+    static async changeUserRoleToUser(userId) {
+        try {
+            console.log(`Verificando ID: ${userId}`); // Log de verificación
+
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                console.error(`ID inválido: ${userId}`);
+                throw new Error('El ID de usuario proporcionado no es válido');
+            }
+
+            console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
+            const user = await Users.findById(userId);
+
+            if (!user) {
+                console.error(`Usuario no encontrado con ID: ${userId}`);
+                throw new Error('No se encontró al usuario');
+            }
+
+            console.log(`Usuario encontrado: ${user}`); // Log de verificación
+            user.role = "user";
+            await user.save();
+
+            console.log(`Rol del usuario actualizado: ${user.role}`); // Log de verificación
+            return user;
+        } catch (error) {
+            console.error('Error al cambiar el role del usuario a "user":', error);
+            throw error;
+        }
+    }
+   
+    //Cambiar Rol a Premium
+    static async changeUserRoleToPremium(userId) {
+        try {
+            console.log(`Verificando ID: ${userId}`); // Log de verificación
+
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                console.error(`ID inválido: ${userId}`);
+                throw new Error('El ID de usuario proporcionado no es válido');
+            }
+
+            console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
+            const user = await Users.findById(userId);
+
+            if (!user) {
+                console.error(`Usuario no encontrado con ID: ${userId}`);
+                throw new Error('No se encontró al usuario');
+            }
+
+            console.log(`Usuario encontrado: ${user}`); // Log de verificación
+            user.role = "premium";
+            await user.save();
+
+            console.log(`Rol del usuario actualizado: ${user.role}`); // Log de verificación
+            return user;
+        } catch (error) {
+            console.error('Error al cambiar el role del usuario a "premium":', error);
+            throw error;
+        }
+    }
+
+    //Cambiar rol a Admin
+    static async changeUserRoleToAdmin(userId) {
+        try {
+            console.log(`Verificando ID: ${userId}`); // Log de verificación
+
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                console.error(`ID inválido: ${userId}`);
+                throw new Error('El ID de usuario proporcionado no es válido');
+            }
+
+            console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
+            const user = await Users.findById(userId);
+
+            if (!user) {
+                console.error(`Usuario no encontrado con ID: ${userId}`);
+                throw new Error('No se encontró al usuario');
+            }
+
+            console.log(`Usuario encontrado: ${user}`); // Log de verificación
+            user.role = "admin";
+            await user.save();
+
+            console.log(`Rol del usuario actualizado: ${user.role}`); // Log de verificación
+            return user;
+        } catch (error) {
+            console.error('Error al cambiar el role del usuario a "premium":', error);
+            throw error;
+        }
+    }
+
+    static async changeUserRoleToPato(userId) {
+        try {
+            console.log(`Verificando ID: ${userId}`); // Log de verificación
+
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                console.error(`ID inválido: ${userId}`);
+                throw new Error('El ID de usuario proporcionado no es válido');
+            }
+
+            console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
+            const user = await Users.findById(userId);
+
+            if (!user) {
+                console.error(`Usuario no encontrado con ID: ${userId}`);
+                throw new Error('No se encontró al usuario');
+            }
+
+            console.log(`Usuario encontrado: ${user}`); // Log de verificación
+            user.role = "pato";
+            await user.save();
+
+            console.log(`Rol del usuario actualizado: ${user.role}`); // Log de verificación
+            return user;
+        } catch (error) {
+            console.error('Error al cambiar el role del usuario a "pato":', error);
+            throw error;
+        }
+    }
+
+    // Método para obtener todos los usuarios con solo los datos principales
+    static async getAllUsers() {
+        try {
+            return await Users.find({}, { first_name: 1, last_name: 1, email: 1, role: 1 }).lean();
+        } catch (error) {
+            throw new Error(`Error al obtener todos los usuarios: ${error.message}`);
+        }
+    }
+
+     // Función para eliminar un usuario por ID
+    static async deleteUserById(userId) {
+        try {
+            console.log(`Verificando ID: ${userId}`); // Log de verificación
+
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                console.error(`ID inválido: ${userId}`);
+                throw new Error('El ID de usuario proporcionado no es válido');
+            }
+
+            console.log(`Buscando usuario por ID: ${userId}`); // Log de verificación
+            const user = await Users.findByIdAndDelete(userId);
+
+            if (!user) {
+                console.error(`Usuario no encontrado con ID: ${userId}`);
+                throw new Error('No se encontró al usuario');
+            }
+
+            console.log(`Usuario eliminado: ${user}`); // Log de verificación
+
+            // Enviar correo electrónico al usuario eliminado
+            try {
+                await sendEmail(user.email, 'Tu cuenta ha sido eliminada', 'Lo sentimos, tu cuenta ha sido eliminada.');
+                console.log(`Email enviado a ${user.email}`);
+            } catch (error) {
+                console.error(`Error al enviar el correo electrónico a ${user.email}:`, error);
+            }
+
+            return user;
+        } catch (error) {
+            console.error('Error al eliminar el usuario:', error);
+            throw error;
+        }
+    }
+
+    // Método para eliminar usuarios inactivos y enviar correos electrónicos
+    static async deleteInactiveUsers() {
+        try {
+            const inactiveDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // Hace 2 días
+            console.log(`Fecha límite para usuarios inactivos: ${inactiveDate}`);
+
+            const deletedUsers = await Users.find({ last_connection: { $lt: inactiveDate } });
+            console.log(`Usuarios inactivos encontrados: ${deletedUsers.length}`);
+
+            if (deletedUsers.length > 0) {
+                await Users.deleteMany({ last_connection: { $lt: inactiveDate } });
+                console.log(`Usuarios eliminados: ${deletedUsers.length}`);
+
+                for (const user of deletedUsers) {
+                    try {
+                        await sendEmail(user.email, 'Tu cuenta ha sido eliminada por inactividad', 'Lo sentimos, tu cuenta ha sido eliminada por inactividad.');
+                        console.log(`Email enviado a ${user.email}`);
+                    } catch (error) {
+                        console.error(`Error al enviar el correo electrónico a ${user.email}:`, error);
+                    }
+                }
+
+                return { message: `Se eliminaron ${deletedUsers.length} usuarios por inactividad.` };
+            } else {
+                return { message: "No se encontraron usuarios inactivos para eliminar." };
+            }
+        } catch (error) {
+            console.error('Error al eliminar usuarios inactivos:', error);
+            throw error;
+        }
+    }
 }
 
 export default UsersDAO;
+

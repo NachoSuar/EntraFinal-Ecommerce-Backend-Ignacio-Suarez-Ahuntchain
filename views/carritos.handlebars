@@ -1,28 +1,52 @@
 <h1>Carrito {{cart._id}}</h1>
-<a href="/" class="home-link" style="margin-top: 10px;">Volver al Inicio</a>
 
 {{#if cart.products.length}}
     <ul>
-        {{#each productIds}}
-            {{#with (lookup ../cart.products @index)}}
-                <li>
-                    Producto: {{this.title}} -
-                    Cantidad: {{this.quantity}}
-                </li>
-            {{/with}}
+        {{#each cart.products}}
+            <li>
+                Producto: {{this.title}} <br>
+                Cantidad: {{this.quantity}} <br>
+                Precio unitario: ${{this.price}} <br>
+            </li>
         {{/each}}
     </ul>
-    <form method="post" action="/carts/{{cart._id}}">
-        <input type="submit" value="Actualizar Carrito">
-    </form>
+    <p>Monto total de la compra: ${{getTotalAmount cart.products}}</p> <!-- Calcula el monto total de la compra -->
+    <!-- Input oculto para almacenar el monto total de la compra -->
+    <input type="hidden" id="totalAmount" value="{{getTotalAmount cart.products}}">
     <form method="post" action="/carts/{{cart._id}}/remove">
         <input type="submit" value="Eliminar Carrito">
     </form>
-    <a href="/carts/{{cart._id}}/purchase" class="purchase-link">Finalizar Compra</a>
+    <a href="/" class="home-link" style="margin-top: 20px;">Volver al Inicio</a>
+    <a href="/carts/{{cart._id}}/purchase_confirmation?totalAmount={{getTotalAmount cart.products}}" class="purchase-link">Finalizar Compra</a>
 {{else}}
     <p>El carrito está vacío</p>
+     <a href="/" class="home-link" style="margin-top: 20px;">Volver al Inicio</a>
 {{/if}}
 
+{{!-- Helpers para calcular el precio total por producto y el monto total de la compra --}}
+{{#helpers}}
+    {{multiply this.price this.quantity}}
+{{/helpers}}
+
+{{#helpers}}
+    {{getTotalAmount cart.products}}
+{{/helpers}}
+
+<script>
+// Obtener el monto total de la compra
+const totalAmount = {{getTotalAmount cart.products}};
+
+// Configurar una cookie para almacenar el monto total de la compra
+document.cookie = `totalAmount=${totalAmount}`;
+
+// Función para obtener el valor de una cookie por su nombre
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+</script>
 
 
 

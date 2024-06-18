@@ -1,31 +1,81 @@
-import customizeError from "../errorCustom/errorCustom.js";
+// Importa los módulos necesarios y configura tus rutas como corresponda
+import UsersDAO from '../dao/users.dao.js'; // Ajusta la ruta según tu estructura
+import customizeError from '../errorCustom/errorCustom.js'; // Ajusta la ruta según tu estructura
 
-export const checkAdmin = (req, res, next) => {
+// Middleware para verificar si el usuario es administrador
+export const checkAdmin = async (req, res, next) => {
     console.log('Middleware checkAdmin ejecutándose');
-    // Verifica si el usuario está autenticado correctamente y si es admin
-    if (req.user && req.user.role === 'admin') {
+    
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            console.log('Usuario no autenticado');
+            return res.status(401).send('Solo Administrador');
+        }
+
+        const user = await UsersDAO.getUserByID(userId);
+        if (!user || user.role !== 'admin') {
+            console.log('Usuario no autorizado');
+            return res.status(403).send('Solo Administrador');
+        }
+
+        req.user = user; // Asigna el usuario a req.user
         console.log('Usuario autenticado y es admin');
-        return next(); // Permite el acceso
-    } else {
-        console.log('Usuario no autorizado');
-        res.status(403).send(customizeError('PERMISSION_DENIED')); // Utiliza la función customizeError para obtener el mensaje de error
+        next();
+    } catch (error) {
+        console.error('Error en middleware checkAdmin:', error);
+        res.status(500).send('SERVER_ERROR');
     }
 };
 
-export const checkUser = (req, res, next) => {
-    if (req.user && req.user.role === 'user') {
-        return next();
-    } else {
-        res.status(403).send(customizeError('PERMISSION_DENIED2')); // Utiliza la función customizeError para obtener el mensaje de error
+// Middleware para verificar si el usuario es usuario normal
+export const checkUser = async (req, res, next) => {
+    console.log('Middleware checkUser ejecutándose');
+    
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            console.log('Usuario no autenticado');
+            return res.status(401).send('Requiere Usuario');
+        }
+
+        const user = await UsersDAO.getUserByID(userId);
+        if (!user || user.role !== 'user') {
+            console.log('Usuario no autorizado');
+            return res.status(403).send(customizeError('Requiere Usuario'));
+        }
+
+        req.user = user; // Asigna el usuario a req.user
+        console.log('Usuario autenticado y es user');
+        next();
+    } catch (error) {
+        console.error('Error en middleware checkUser:', error);
+        res.status(500).send('SERVER_ERROR');
     }
 };
 
-export const checkUserPremiun = (req, res, next) => {
-    if (req.user && req.user.role === 'premium') {
-        return next();
-    } else {
-        res.status(403).send(customizeError('PERMISSION_DENIED2')); 
+// Middleware para verificar si el usuario es premium
+export const checkUserPremiun = async (req, res, next) => {
+    console.log('Middleware checkUserPremiun ejecutándose');
+    
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            console.log('Usuario no autenticado');
+            return res.status(401).send('Requiere Premium');
+        }
+
+        const user = await UsersDAO.getUserByID(userId);
+        if (!user || user.role !== 'premium') {
+            console.log('Usuario no autorizado');
+            return res.status(403).send(customizeError('Requiere Premium'));
+        }
+
+        req.user = user; // Asigna el usuario a req.user
+        console.log('Usuario autenticado y es premium');
+        next();
+    } catch (error) {
+        console.error('Error en middleware checkUserPremiun:', error);
+        res.status(500).send('SERVER_ERROR');
     }
 };
-
-

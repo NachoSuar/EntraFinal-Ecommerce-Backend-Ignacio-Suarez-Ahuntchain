@@ -5,7 +5,7 @@ import http from 'http';
 import { Server } from 'socket.io'; 
 import cartsRouter from "./routes/carts.route.js";
 import Cart from './dao/models/cart.schema.js';
-import prodsRouter from './routes/products.route.js';
+import prodsRouter from "./routes/products.route.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import MongoStore from "connect-mongo";
@@ -21,6 +21,10 @@ import swaggerRouter from "./swagger.js";
 import swaggerSpec from "./swagger.js";
 import swaggerUi from "swagger-ui-express";
 import usersRouter from "./routes/users.router.js";
+import Handlebars from 'handlebars';
+import methodOverride from 'method-override';
+import routesAdmin from './routes/admin.route.js'
+import ticket from './routes/ticket.route.js'
 
 // Función para validar ObjectId
 function isValidObjectId(id) {
@@ -33,7 +37,12 @@ const server = http.createServer(app);
 const io = new Server(server); 
 
 // View engine
-app.engine('handlebars', engine());
+app.engine('handlebars', engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    },
+}));
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
@@ -56,11 +65,34 @@ app.use(session({
 }));
 
 app.use("/api/sessions", sessionsRouter);
+app.use("/api/users", usersRouter);
 app.use("/", viewRouter);
+app.use('/api/users', routesAdmin);
+app.use('/api/carts', ticket);
 
 //Swagger
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(swaggerSpec));
+
+
+// Middleware para cargar el usuario en sesión
+app.use(async (req, res, next) => {
+    const userId = req.session.user;
+    console.log('Middleware de carga de usuario en sesión ejecutándose. Usuario en sesión:', userId);
+    if (userId) {
+        try {
+            const user = await UsersDAO.getUserByID(userId);
+            req.user = user; // Asigna el usuario a req.user
+            console.log('Usuario cargado en sesión:', req.user);
+        } catch (error) {
+            console.error('Error al cargar usuario en sesión:', error);
+            req.user = null;
+        }
+    } else {
+        req.user = null;
+    }
+    next();
+});
 
 // Middleware global para todas las rutas
 app.use(async (req, res, next) => {
@@ -73,8 +105,75 @@ app.use(async (req, res, next) => {
     next();
 });
 
+// Middleware para inicializar Passport y manejo de sesiones
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+
+// Define un helper llamado "multiply" que multiplica dos valores
+Handlebars.registerHelper('multiply', function(a, b) {
+    return a * b;
+});
+
+// Define un helper llamado "getTotalAmount" que calcula el monto total de la compra
+Handlebars.registerHelper('getTotalAmount', function(products) {
+    let totalAmount = 0;
+    products.forEach(function(product) {
+        totalAmount += product.price * product.quantity;
+    });
+    return totalAmount;
+});
+
+// Define un helper llamado "getQueryParam" que obtiene un parámetro de consulta de la URL
+Handlebars.registerHelper('getQueryParam', function(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+});
+
+// Define un helper llamado "eq" para admin
+Handlebars.registerHelper('eq', function(a, b, options) {
+    return a === b ? options.fn(this) : options.inverse(this);
+});
+
+// Define un helper llamado "getParameterByName" que obtiene el valor de un parámetro de la URL por su nombre
+Handlebars.registerHelper('getParameterByName', function(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    const results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+});
+
+
+// Configuración de Handlebars
+app.engine('handlebars', engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    },
+    helpers: { // Registra el helper getTotalAmount de forma global
+        getTotalAmount: function(products) {
+            let totalAmount = 0;
+            products.forEach(function(product) {
+                totalAmount += product.price * product.quantity;
+            });
+            return totalAmount;
+        }
+    }
+}));
+
+//Ruta de pago
+app.get("/carts/:cid/purchase_confirmation", (req, res) => {
+    const { code, amount, purchaser } = req.query;
+    console.log('Ticket data:', { code, amount, purchaser }); // Log para verificar los datos del ticket
+    res.render("purchase_confirmation", { ticket: { code, amount, purchaser } });
+  });
+  
+// Middleware para interpretar el campo _method
+app.use(methodOverride('_method'));
 
 // Router productos
 app.use("/products", prodsRouter);
@@ -90,7 +189,6 @@ app.get('/formulario', (req, res) => {
     res.render('formulario');
 });
 
-
 // Nueva ruta para eliminar productos
 app.get("/products/remove", (req, res) => {
     console.log('Intentando renderizar la vista remove-product');
@@ -104,7 +202,7 @@ app.get("/products/remove", (req, res) => {
     }
 });
 
-// modelo del carrito
+// Modelo del carrito
 app.get('/mostrar_carrito', async (req, res) => {
     try {
       const carrito = await Cart.findOne({ });
@@ -172,8 +270,6 @@ io.on('connection', (socket) => {
     });
 });
 
-
-
 // Conexión MongoDB
 mongoose.connect(config.mongoDB.url);
 
@@ -189,3 +285,4 @@ server.listen(PORT, () => {
 
 export default app;
 export { io };
+

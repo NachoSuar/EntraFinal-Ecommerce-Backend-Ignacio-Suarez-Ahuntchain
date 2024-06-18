@@ -9,11 +9,43 @@
 <a href="/api/sessions/logout">Logout</a>
 
 <a href="/formulario">Subir Documentos</a>
-<form action="/premium/{{user._id}}" method="PUT">
-    <button type="submit">Convertirse en Premium</button>
+
+<!-- Formulario para cambiar el rol a "user" -->
+<form action="/api/users/{{user._id}}/changeRoleToUserPerf" method="POST">
+  <button type="submit">Cambiar a User</button>
+</form>
+
+<!-- Formulario para cambiar el rol a "premium" -->
+<form action="/api/users/{{user._id}}/changeRoleToPremiumPerf" method="POST">
+ <button type="submit">Cambiar a Premium</button>
 </form>
 
 
-
+<script>
+    document.getElementById('changeRoleButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Evitar el comportamiento predeterminado del formulario
+        const userId = "{{user._id}}"; // Obtener el ID del usuario
+        fetch(`/change-role-to-pato/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Hubo un problema al cambiar el rol del usuario');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Rol cambiado con éxito:', data);
+            // Aquí podrías hacer algo como actualizar la vista para reflejar el cambio de rol
+        })
+        .catch(error => {
+            console.error('Error al cambiar el rol del usuario:', error);
+            // Aquí podrías mostrar un mensaje de error al usuario
+        });
+    });
+</script>
 
 

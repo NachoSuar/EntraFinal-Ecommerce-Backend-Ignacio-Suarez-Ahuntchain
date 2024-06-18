@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Administración de Usuarios</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Color de fondo para destacar el contenido */
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto; /* Centra el contenedor y añade espacio arriba y abajo */
+            background-color: #fff; /* Fondo blanco para el contenedor */
+            padding: 20px; /* Espacio interno dentro del contenedor */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera alrededor del contenedor */
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center; /* Alinea el texto al centro en las celdas */
+        }
+        button {
+            margin: 5px;
+        }
+        a {
+            display: block; /* Para que el enlace ocupe todo el ancho disponible */
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        async function deleteInactiveUsers() {
+            try {
+                const response = await fetch('/api/users/inactiveUsers', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message); // Muestra el mensaje devuelto por el backend
+                } else {
+                    const error = await response.json();
+                    console.error(`Error al eliminar usuarios inactivos: ${error.details}`);
+                    alert(`Error al eliminar usuarios inactivos: ${error.details}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar usuarios inactivos');
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Administración de Usuarios</h1>
+        <button onclick="deleteInactiveUsers()">Eliminar Usuarios Inactivos</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each usuarios}}
+                <tr>
+                    <td>{{this.first_name}} {{this.last_name}}</td>
+                    <td>{{this.email}}</td>
+                    <td>{{this.role}}</td>
+                    <td>
+                        <!-- Formulario para cambiar el rol a "user" -->
+                        <form action="/api/users/{{this._id}}/changeRoleToUser" method="POST">
+                            <button type="submit">Cambiar a User</button>
+                        </form>
+                        <!-- Formulario para cambiar el rol a "premium" -->
+                        <form action="/api/users/{{this._id}}/changeRoleToPremium" method="POST">
+                            <button type="submit">Cambiar a Premium</button>
+                        </form>
+                        <!-- Formulario para cambiar el rol a "admin" -->
+                        <form action="/api/users/{{this._id}}/changeRoleToAdmin" method="POST">
+                            <button type="submit">Cambiar a Admin</button>
+                        </form>
+                        <form action="/api/users/{{this._id}}/delete" method="POST">
+                            <button type="submit">Eliminar Usuario</button>
+                        </form>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <a href="/">Volver al Inicio</a>
+    </div>
+</body>
+</html>

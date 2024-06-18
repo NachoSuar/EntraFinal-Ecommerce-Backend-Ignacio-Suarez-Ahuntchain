@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import UsersDAO from "../dao/users.dao.js";
+import { checkAdmin } from "../utils/permissions.middleware.js";
 
 const router = Router();
 
@@ -93,7 +94,7 @@ router.post("/:uid/documents", upload, async (req, res) => {
 router.put('/premium/:uid', async (req, res) => {
     const userId = req.params.uid;
 
-    // Agregar un console.log para depurar
+    // Agregar console.log para depurar
     console.log("Llegó a la ruta '/premium/:uid'");
     console.log("User ID:", userId);
 
@@ -111,6 +112,9 @@ router.put('/premium/:uid', async (req, res) => {
             // Actualizar el rol del usuario a "premium"
             await UsersDAO.updateRole(userId, 'premium');
             
+            // Agregar console.log para depurar
+            console.log("El rol del usuario es 'user'. Actualizando a 'premium'.");
+            
             // Redirigir al perfil después de actualizar el rol a premium
             return res.redirect("/profile");
         } else {
@@ -122,8 +126,50 @@ router.put('/premium/:uid', async (req, res) => {
     }
 });
 
+router.put('/revert-premium/:uid', async (req, res) => {
+    const userId = req.params.uid;
 
+    try {
+        const user = await UsersDAO.getUserByID(userId);
 
+        if (!user) {
+            return res.status(404).send('Usuario no encontrado');
+        }
 
+        if (user.role === 'premium') {
+            await UsersDAO.updateRole(userId, 'user');
+            return res.redirect("/profile");
+        } else {
+            return res.status(400).send('El usuario no es premium');
+        }
+    } catch (error) {
+        console.error('Error al revertir el rol del usuario a user:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+// Obtener todos los usuarios
+router.get("/userslist", checkAdmin, async (req, res) => {
+    try {
+        const users = await UsersDAO.getAllUsers();
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+// Eliminar usuarios inactivos
+router.delete("/inactiveUsers", checkAdmin, async (req, res) => {
+    try {
+        console.log("Solicitud para eliminar usuarios inactivos recibida");
+        const result = await UsersDAO.deleteInactiveUsers();
+        console.log('Eliminación cumplida:', result);
+        res.status(200).json(result); // Cambiar a JSON para que el cliente pueda manejar la respuesta
+    } catch (error) {
+        console.error('Error al eliminar usuarios inactivos:', error);
+        res.status(500).json({ error: 'Error interno del servidor', details: error.message });
+    }
+});
 
 export default router;

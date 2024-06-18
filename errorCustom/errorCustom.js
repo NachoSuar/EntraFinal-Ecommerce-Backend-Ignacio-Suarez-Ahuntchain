@@ -6,7 +6,8 @@ const errorMessages = {
     PRODUCT_ALREADY_IN_CART: "El producto ya está en el carrito.",
     PERMISSION_DENIED: "Se requiere permiso de administrador.",
     PERMISSION_DENIED2: "Se requiere logueo de usuario",
-    PERMISSION_DENIED3: "Se requiere permiso de administrador o premium."
+    PERMISSION_DENIED3: "Se requiere permiso de administrador o premium.",
+    PERMISSION_DENIED4: "Se requiere permiso de administrador o premium o usuario."
 };
 
 // Función para personalizar mensajes de error

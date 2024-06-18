@@ -1,5 +1,6 @@
 import { Router } from "express";
 import UsersDAO from "../dao/users.dao.js";
+import { checkAdmin, checkUser } from "../utils/permissions.middleware.js";
 
 const router = Router()
 
@@ -59,6 +60,17 @@ router.get("/ejemplo", (req, res) => {
 router.get("/prueba", (req, res) => {
     console.log("Renderizando el formulario de restablecimiento de contraseña...");
     res.render("test"); // Renderizar el formulario de restablecimiento de contraseña
+});
+
+// Suponiendo que 'users' se pasa al template como un array de objetos de usuario
+router.get('/admin/admin', checkAdmin, async (req, res) => {
+    try {
+        const usuarios = await UsersDAO.getAllUsers();
+        res.render('admin-users', { usuarios });
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).send('Error interno del servidor');
+    }
 });
 
 export default router;

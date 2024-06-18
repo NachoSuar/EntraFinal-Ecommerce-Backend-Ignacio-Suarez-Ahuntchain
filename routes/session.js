@@ -30,11 +30,11 @@ const updateLastConnection = async (req, res, next) => {
 };
 
 // Ruta de inicio de sesión
-router.post("/login", passport.authenticate("login", {failureRedirect:"/faillogin"}), updateLastConnection, async (req,res) => {
-    if(!req.user) {
+router.post("/login", passport.authenticate("login", { failureRedirect: "/faillogin" }), updateLastConnection, async (req, res) => {
+    if (!req.user) {
         return res.redirect("/login");
     }
-    req.session.user = req.user._id;
+    req.session.user = req.user;
     res.redirect("/products");
 });
 
